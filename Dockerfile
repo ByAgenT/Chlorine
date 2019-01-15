@@ -4,7 +4,7 @@ WORKDIR /go/src/akovalyov/chlorine/
 ADD . ./
 
 # Install project dependencies
-RUN go get golang.org/x/oauth2/clientcredentials
+RUN go get golang.org/x/oauth2/
 RUN go get github.com/gorilla/mux
 RUN go get github.com/gorilla/sessions
 RUN go get github.com/zmb3/spotify

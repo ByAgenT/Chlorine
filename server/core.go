@@ -2,21 +2,23 @@ package server
 
 import (
 	"encoding/gob"
+	"log"
 	"net/http"
 	"time"
-
-	"golang.org/x/oauth2"
 )
 
 // StartChlorineServer starts Chlorine to listen to HTTP connections on the given port.
 func StartChlorineServer(port string) {
-	http.HandleFunc("/login", handleLogin)
+	http.HandleFunc("/login", logHandler(handleLogin))
 	http.HandleFunc("/authcomplete", completeAuth)
-	http.HandleFunc("/me/playlists", getMyPlaylists)
-	http.ListenAndServe(port, nil)
+	http.HandleFunc("/me/playlists", logHandler(getMyPlaylists))
+	err := http.ListenAndServe(port, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func init() {
-	gob.Register(&oauth2.Token{})
 	gob.Register(&time.Time{})
+	gob.Register(&time.Location{})
 }
