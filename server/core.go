@@ -11,7 +11,8 @@ import (
 func StartChlorineServer(port string) {
 	http.HandleFunc("/login", logHandler(handleLogin))
 	http.HandleFunc("/authcomplete", completeAuth)
-	http.HandleFunc("/me/playlists", logHandler(getMyPlaylists))
+	http.HandleFunc("/me/playlists", logHandler(myPlaylists))
+	http.HandleFunc("/token", logHandler(spotifyToken))
 	err := http.ListenAndServe(port, nil)
 	if err != nil {
 		log.Fatal(err)

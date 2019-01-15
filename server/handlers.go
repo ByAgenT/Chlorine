@@ -26,19 +26,19 @@ func completeAuth(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Printf("server: completeAuth: token process error: %s", err)
 		http.Error(w, "Authentication error", http.StatusForbidden)
+		return
 	}
 
 	auth.WriteTokenToSession(session, token)
 	err = session.Save(r, w)
 	if err != nil {
 		log.Printf("server: completeAuth: error saving session: %s", err)
-
 	}
 
 	http.Redirect(w, r, "me/playlists", http.StatusFound)
 }
 
-func getMyPlaylists(w http.ResponseWriter, r *http.Request) {
+func myPlaylists(w http.ResponseWriter, r *http.Request) {
 	session := initSession(r)
 	if session.IsNew {
 		http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
@@ -49,21 +49,41 @@ func getMyPlaylists(w http.ResponseWriter, r *http.Request) {
 
 	token, err := auth.GetTokenFromSession(session)
 	if err != nil {
-		log.Printf("server: getMyPlaylists: error retrieving token from session: %s", err)
+		log.Printf("server: myPlaylists: error retrieving token from session: %s", err)
 		http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
 		return
 	}
 	client := authenticator.NewClient(token)
 	playlists, err := client.CurrentUsersPlaylists()
 	if err != nil {
-		log.Printf("server: getMyPlaylists: cannot get top tracks: %s", err)
+		log.Printf("server: myPlaylists: cannot get top tracks: %s", err)
 		http.Error(w, "Error retrieving songs.", http.StatusForbidden)
+		return
 	}
 	serializedPlaylists, err := json.Marshal(playlists)
 	if err != nil {
-		log.Printf("server: getMyPlaylists: %s", err)
+		log.Printf("server: myPlaylists: %s", err)
 		http.Error(w, "Error processing songs.", http.StatusForbidden)
+		return
 	}
 	w.Header().Add("Content-Type", "application/json")
 	w.Write(serializedPlaylists)
+}
+
+func spotifyToken(w http.ResponseWriter, r *http.Request) {
+	session := initSession(r)
+	token, err := auth.GetTokenFromSession(session)
+	if err != nil {
+		log.Printf("server: spotifyToken: error retrieving token from session: %s", err)
+		http.Error(w, "Error retrieving token", http.StatusForbidden)
+		return
+	}
+	serializedToken, err := json.Marshal(token)
+	if err != nil {
+		log.Printf("server: spotifyToken: cannot serialize token: %s", err)
+		http.Error(w, "Error retrieving token.", http.StatusInternalServerError)
+		return
+	}
+	w.Header().Add("Content-Type", "application/json")
+	w.Write(serializedToken)
 }
