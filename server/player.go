@@ -1,0 +1,31 @@
+package server
+
+import (
+	"akovalyov/chlorine/auth"
+	"log"
+	"net/http"
+)
+
+// AvailableDevices returns list of Spotify available devices.
+func AvailableDevices(w http.ResponseWriter, r *http.Request) {
+	session := auth.InitSession(r)
+	jsonWriter := JSONResponseWriter{w}
+
+	authenticator := auth.GetSpotifyAuthenticator()
+
+	token, err := auth.GetTokenFromSession(session)
+	if err != nil {
+		log.Printf("server: AvailableDevices: error retrieving token from session: %s", err)
+		http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
+		return
+	}
+
+	client := authenticator.NewClient(token)
+	devices, err := client.PlayerDevices()
+	if err != nil {
+		log.Printf("server: AvailableDevices: error retrieving devices from spotify: %s", err)
+		http.Error(jsonWriter, "Cannot retrieve devices", http.StatusForbidden)
+		return
+	}
+	jsonWriter.WriteJSONObject(devices)
+}
