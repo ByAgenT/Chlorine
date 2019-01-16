@@ -1,4 +1,4 @@
-package server
+package auth
 
 import (
 	"net/http"
@@ -17,7 +17,7 @@ func createStore() *sessions.CookieStore {
 	return store
 }
 
-func initSession(r *http.Request) *sessions.Session {
+func InitSession(r *http.Request) *sessions.Session {
 	session, err := sessionStore.Get(r, "chlorine_session")
 	if err != nil {
 		panic(err)
