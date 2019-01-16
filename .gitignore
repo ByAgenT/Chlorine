@@ -5,6 +5,10 @@
 *.so
 *.dylib
 
+# Binaries that could be created by go build
+debug
+chlorine
+
 # Test binary, built with `go test -c`
 *.test
 

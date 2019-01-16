@@ -20,7 +20,12 @@ const (
 )
 
 var (
-	scopes    = []string{"streaming", spotify.ScopeUserReadBirthdate, spotify.ScopeUserReadEmail, spotify.ScopeUserReadPrivate, spotify.ScopePlaylistReadPrivate}
+	scopes = []string{"streaming",
+		spotify.ScopeUserReadBirthdate,
+		spotify.ScopeUserReadEmail,
+		spotify.ScopeUserReadPrivate,
+		spotify.ScopePlaylistReadPrivate,
+		spotify.ScopeUserReadPlaybackState}
 	secretKey = os.Getenv("SECRET_KEY")
 )
 
