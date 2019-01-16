@@ -1,4 +1,4 @@
-package handlers
+package server
 
 import (
 	"akovalyov/chlorine/auth"

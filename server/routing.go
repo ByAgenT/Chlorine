@@ -1,4 +1,4 @@
-package handlers
+package server
 
 import (
 	"akovalyov/chlorine/middleware"
@@ -6,7 +6,6 @@ import (
 )
 
 // GetApplicationHandler create ServeMux instance with all applicaion routes.
-
 func GetApplicationHandler() *http.ServeMux {
 	handler := http.NewServeMux()
 
