@@ -1,6 +1,7 @@
 package server
 
 import (
+	"akovalyov/chlorine/apierror"
 	"akovalyov/chlorine/auth"
 	"log"
 	"net/http"
@@ -60,7 +61,7 @@ func (h SpotifyTokenHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	token, err := auth.GetTokenFromSession(h.GetSession())
 	if err != nil {
 		log.Printf("server: spotifyToken: error retrieving token from session: %s", err)
-		http.Error(w, "Error retrieving token", http.StatusForbidden)
+		jsonWriter.Error(apierror.APIErrorUnauthorized, http.StatusForbidden)
 		return
 	}
 

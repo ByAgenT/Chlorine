@@ -1,6 +1,7 @@
 package server
 
 import (
+	"akovalyov/chlorine/apierror"
 	"encoding/json"
 	"net/http"
 )
@@ -24,4 +25,16 @@ func (w JSONResponseWriter) WriteJSONObject(object interface{}) error {
 	}
 	w.WriteJSON(marshaledObject)
 	return nil
+}
+
+// Error writes to the ResponseWriter APIError in JSON serialized form.
+func (w JSONResponseWriter) Error(apiError apierror.APIError, httpCode int) {
+	w.Header().Add("Content-Type", "application/json")
+	errMsg, err := json.Marshal(apiError)
+	if err != nil {
+		panic(err)
+	}
+	w.WriteHeader(httpCode)
+	w.Write(errMsg)
+
 }

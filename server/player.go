@@ -1,6 +1,7 @@
 package server
 
 import (
+	"akovalyov/chlorine/apierror"
 	"akovalyov/chlorine/auth"
 	"log"
 	"net/http"
@@ -19,16 +20,16 @@ func (h AvailableDevicesHandler) ServeHTTP(w http.ResponseWriter, r *http.Reques
 
 	token, err := auth.GetTokenFromSession(h.GetSession())
 	if err != nil {
-		log.Printf("server: AvailableDevices: error retrieving token from session: %s", err)
-		http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
+		log.Printf("server: AvailableDevicesHandler: error retrieving token from session: %s", err)
+		jsonWriter.Error(apierror.APIErrorUnauthorized, http.StatusForbidden)
 		return
 	}
 
 	client := authenticator.NewClient(token)
 	devices, err := client.PlayerDevices()
 	if err != nil {
-		log.Printf("server: AvailableDevices: error retrieving devices from spotify: %s", err)
-		http.Error(jsonWriter, "Cannot retrieve devices", http.StatusForbidden)
+		log.Printf("server: AvailableDevicesHandler: error retrieving devices from spotify: %s", err)
+		jsonWriter.Error(apierror.APIErrorUnauthorized, http.StatusForbidden)
 		return
 	}
 	jsonWriter.WriteJSONObject(devices)
