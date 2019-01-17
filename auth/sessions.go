@@ -7,6 +7,22 @@ import (
 	"github.com/gorilla/sessions"
 )
 
+// Session is a structure for creating handlers with session.
+type Session struct {
+	session *sessions.Session
+}
+
+// GetSession return session instance.
+func (s *Session) GetSession() *sessions.Session {
+	// TODO: make validation if session is initialized
+	return s.session
+}
+
+// InitSession method initialize sesstion objects within the handler
+func (s *Session) InitSession(r *http.Request) {
+	s.session = InitSession(r)
+}
+
 var sessionStore = createStore()
 
 func createStore() *sessions.CookieStore {

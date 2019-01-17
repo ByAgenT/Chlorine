@@ -8,16 +8,16 @@ import (
 
 // AvailableDevicesHandler is a handler of a list of user's available devices.
 type AvailableDevicesHandler struct {
-	Session
+	auth.Session
 }
 
 func (h AvailableDevicesHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	h.session = auth.InitSession(r)
+	h.InitSession(r)
 	jsonWriter := JSONResponseWriter{w}
 
 	authenticator := auth.GetSpotifyAuthenticator()
 
-	token, err := auth.GetTokenFromSession(h.session)
+	token, err := auth.GetTokenFromSession(h.GetSession())
 	if err != nil {
 		log.Printf("server: AvailableDevices: error retrieving token from session: %s", err)
 		http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)

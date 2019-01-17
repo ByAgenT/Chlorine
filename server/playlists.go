@@ -8,21 +8,21 @@ import (
 
 // MyPlaylistsHandler is a handler for user's personal playlists in Spotify
 type MyPlaylistsHandler struct {
-	Session
+	auth.Session
 }
 
 func (h MyPlaylistsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	h.session = auth.InitSession(r)
+	h.InitSession(r)
 	jsonWriter := JSONResponseWriter{w}
 
-	if h.session.IsNew {
+	if h.GetSession().IsNew {
 		http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
 		return
 	}
 
 	authenticator := auth.GetSpotifyAuthenticator()
 
-	token, err := auth.GetTokenFromSession(h.session)
+	token, err := auth.GetTokenFromSession(h.GetSession())
 	if err != nil {
 		log.Printf("server: MyPlaylists: error retrieving token from session: %s", err)
 		http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
