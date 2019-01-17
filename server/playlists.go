@@ -2,14 +2,19 @@ package server
 
 import (
 	"akovalyov/chlorine/auth"
-	"encoding/json"
 	"log"
 	"net/http"
 )
 
-// MyPlaylists returns list of personal playlists
-func MyPlaylists(w http.ResponseWriter, r *http.Request) {
+// MyPlaylistsHandler is a handler for user's personal playlists in Spotify
+type MyPlaylistsHandler struct {
+	Session
+}
+
+func (h MyPlaylistsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	session := auth.InitSession(r)
+	jsonWriter := JSONResponseWriter{w}
+
 	if session.IsNew {
 		http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
 		return
@@ -30,12 +35,5 @@ func MyPlaylists(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Error retrieving songs.", http.StatusForbidden)
 		return
 	}
-	serializedPlaylists, err := json.Marshal(playlists)
-	if err != nil {
-		log.Printf("server: MyPlaylists: %s", err)
-		http.Error(w, "Error processing songs.", http.StatusForbidden)
-		return
-	}
-	w.Header().Add("Content-Type", "application/json")
-	w.Write(serializedPlaylists)
+	jsonWriter.WriteJSONObject(playlists)
 }

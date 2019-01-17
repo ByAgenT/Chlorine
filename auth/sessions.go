@@ -17,6 +17,7 @@ func createStore() *sessions.CookieStore {
 	return store
 }
 
+// InitSession creates new session in the store and return it.
 func InitSession(r *http.Request) *sessions.Session {
 	session, err := sessionStore.Get(r, "chlorine_session")
 	if err != nil {

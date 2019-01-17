@@ -6,8 +6,12 @@ import (
 	"net/http"
 )
 
-// AvailableDevices returns list of Spotify available devices.
-func AvailableDevices(w http.ResponseWriter, r *http.Request) {
+// AvailableDevicesHandler is a handler of a list of user's available devices.
+type AvailableDevicesHandler struct {
+	Session
+}
+
+func (h AvailableDevicesHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	session := auth.InitSession(r)
 	jsonWriter := JSONResponseWriter{w}
 

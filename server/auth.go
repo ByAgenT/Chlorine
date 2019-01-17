@@ -2,13 +2,16 @@ package server
 
 import (
 	"akovalyov/chlorine/auth"
-	"encoding/json"
 	"log"
 	"net/http"
 )
 
-// HandleLogin initiates Chlorine session and start OAuth2 authentication flow for Spotify.
-func HandleLogin(w http.ResponseWriter, r *http.Request) {
+// LoginHandler initiates Chlorine room and start OAuth2 authentication flow for Spotify.
+type LoginHandler struct {
+	Session
+}
+
+func (h LoginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	authenticator := auth.GetSpotifyAuthenticator()
 	session := auth.InitSession(r)
 	state := auth.CreateRandomState(session)
@@ -20,8 +23,12 @@ func HandleLogin(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, authenticator.AuthURL(state), http.StatusFound)
 }
 
-// CompleteAuth receives result from Spotify authorization and finishes authentication flow.
-func CompleteAuth(w http.ResponseWriter, r *http.Request) {
+// CompleteAuthHandler receives result from Spotify authorization and finishes authentication flow.
+type CompleteAuthHandler struct {
+	Session
+}
+
+func (h CompleteAuthHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	session := auth.InitSession(r)
 
 	token, err := auth.ProcessReceivedToken(r, session)
@@ -40,20 +47,19 @@ func CompleteAuth(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "me/playlists", http.StatusFound)
 }
 
-// SpotifyToken return Spotify authentication token from authorized user
-func SpotifyToken(w http.ResponseWriter, r *http.Request) {
+// SpotifyTokenHandler returns Spotify authentication token from authorized user.
+type SpotifyTokenHandler struct {
+	Session
+}
+
+func (h SpotifyTokenHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	session := auth.InitSession(r)
+	jsonWriter := JSONResponseWriter{w}
+
 	token, err := auth.GetTokenFromSession(session)
 	if err != nil {
 		log.Printf("server: spotifyToken: error retrieving token from session: %s", err)
 		http.Error(w, "Error retrieving token", http.StatusForbidden)
-		return
-	}
-
-	serializedToken, err := json.Marshal(token)
-	if err != nil {
-		log.Printf("server: spotifyToken: cannot serialize token: %s", err)
-		http.Error(w, "Error retrieving token.", http.StatusInternalServerError)
 		return
 	}
 
@@ -62,6 +68,5 @@ func SpotifyToken(w http.ResponseWriter, r *http.Request) {
 		log.Printf("server: spotifyToken: cannot save session: %s", err)
 	}
 
-	w.Header().Add("Content-Type", "application/json")
-	w.Write(serializedToken)
+	jsonWriter.WriteJSONObject(token)
 }

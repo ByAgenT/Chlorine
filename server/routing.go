@@ -8,13 +8,18 @@ import (
 // GetApplicationHandler create ServeMux instance with all applicaion routes.
 func GetApplicationHandler() *http.ServeMux {
 	handler := http.NewServeMux()
-
-	handler.HandleFunc("/login", middleware.ApplyMiddlewares(HandleLogin, middleware.LogMiddleware))
-	handler.HandleFunc("/authcomplete", CompleteAuth)
-	handler.HandleFunc("/token", middleware.ApplyMiddlewares(SpotifyToken, middleware.LogMiddleware))
-
-	handler.HandleFunc("/me/playlists", middleware.ApplyMiddlewares(MyPlaylists, middleware.LogMiddleware))
-	handler.HandleFunc("/me/player/devices", middleware.ApplyMiddlewares(AvailableDevices, middleware.LogMiddleware))
-
+	authRouting(handler)
+	spotifyRouting(handler)
 	return handler
+}
+
+func authRouting(handler *http.ServeMux) {
+	handler.Handle("/login", middleware.ApplyMiddlewares(LoginHandler{}, LogMiddleware))
+	handler.Handle("/authcomplete", CompleteAuthHandler{})
+	handler.Handle("/token", middleware.ApplyMiddlewares(SpotifyTokenHandler{}, LogMiddleware))
+}
+
+func spotifyRouting(handler *http.ServeMux) {
+	handler.Handle("/me/playlists", middleware.ApplyMiddlewares(MyPlaylistsHandler{}, LogMiddleware))
+	handler.Handle("/me/player/devices", middleware.ApplyMiddlewares(AvailableDevicesHandler{}, LogMiddleware))
 }
