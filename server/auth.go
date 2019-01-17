@@ -12,11 +12,12 @@ type LoginHandler struct {
 }
 
 func (h LoginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	h.session = auth.InitSession(r)
+
 	authenticator := auth.GetSpotifyAuthenticator()
-	session := auth.InitSession(r)
-	state := auth.CreateRandomState(session)
-	session.Values["CSRFState"] = state
-	err := session.Save(r, w)
+	state := auth.CreateRandomState(h.session)
+	h.session.Values["CSRFState"] = state
+	err := h.session.Save(r, w)
 	if err != nil {
 		log.Printf("server: handleLogin: error saving session: %s", err)
 	}
@@ -29,17 +30,17 @@ type CompleteAuthHandler struct {
 }
 
 func (h CompleteAuthHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	session := auth.InitSession(r)
+	h.session = auth.InitSession(r)
 
-	token, err := auth.ProcessReceivedToken(r, session)
+	token, err := auth.ProcessReceivedToken(r, h.session)
 	if err != nil {
 		log.Printf("server: completeAuth: token process error: %s", err)
 		http.Error(w, "Authentication error", http.StatusForbidden)
 		return
 	}
 
-	auth.WriteTokenToSession(session, token)
-	err = session.Save(r, w)
+	auth.WriteTokenToSession(h.session, token)
+	err = h.session.Save(r, w)
 	if err != nil {
 		log.Printf("server: completeAuth: error saving session: %s", err)
 	}
@@ -53,17 +54,17 @@ type SpotifyTokenHandler struct {
 }
 
 func (h SpotifyTokenHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	session := auth.InitSession(r)
+	h.session = auth.InitSession(r)
 	jsonWriter := JSONResponseWriter{w}
 
-	token, err := auth.GetTokenFromSession(session)
+	token, err := auth.GetTokenFromSession(h.session)
 	if err != nil {
 		log.Printf("server: spotifyToken: error retrieving token from session: %s", err)
 		http.Error(w, "Error retrieving token", http.StatusForbidden)
 		return
 	}
 
-	err = session.Save(r, w)
+	err = h.session.Save(r, w)
 	if err != nil {
 		log.Printf("server: spotifyToken: cannot save session: %s", err)
 	}

@@ -12,17 +12,17 @@ type MyPlaylistsHandler struct {
 }
 
 func (h MyPlaylistsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	session := auth.InitSession(r)
+	h.session = auth.InitSession(r)
 	jsonWriter := JSONResponseWriter{w}
 
-	if session.IsNew {
+	if h.session.IsNew {
 		http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
 		return
 	}
 
 	authenticator := auth.GetSpotifyAuthenticator()
 
-	token, err := auth.GetTokenFromSession(session)
+	token, err := auth.GetTokenFromSession(h.session)
 	if err != nil {
 		log.Printf("server: MyPlaylists: error retrieving token from session: %s", err)
 		http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)

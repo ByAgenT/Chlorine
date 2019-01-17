@@ -12,12 +12,12 @@ type AvailableDevicesHandler struct {
 }
 
 func (h AvailableDevicesHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	session := auth.InitSession(r)
+	h.session = auth.InitSession(r)
 	jsonWriter := JSONResponseWriter{w}
 
 	authenticator := auth.GetSpotifyAuthenticator()
 
-	token, err := auth.GetTokenFromSession(session)
+	token, err := auth.GetTokenFromSession(h.session)
 	if err != nil {
 		log.Printf("server: AvailableDevices: error retrieving token from session: %s", err)
 		http.Redirect(w, r, "/login", http.StatusTemporaryRedirect)
