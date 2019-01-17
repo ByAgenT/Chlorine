@@ -8,9 +8,7 @@ import (
 )
 
 // LoginHandler initiates Chlorine room and start OAuth2 authentication flow for Spotify.
-type LoginHandler struct {
-	auth.Session
-}
+type LoginHandler SessionedHandler
 
 func (h LoginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	h.InitSession(r)
@@ -26,9 +24,7 @@ func (h LoginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 // CompleteAuthHandler receives result from Spotify authorization and finishes authentication flow.
-type CompleteAuthHandler struct {
-	auth.Session
-}
+type CompleteAuthHandler SessionedHandler
 
 func (h CompleteAuthHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	h.InitSession(r)
@@ -50,9 +46,7 @@ func (h CompleteAuthHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 // SpotifyTokenHandler returns Spotify authentication token from authorized user.
-type SpotifyTokenHandler struct {
-	auth.Session
-}
+type SpotifyTokenHandler SessionedHandler
 
 func (h SpotifyTokenHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	h.InitSession(r)
