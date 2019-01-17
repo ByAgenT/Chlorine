@@ -22,4 +22,5 @@ func authRouting(handler *http.ServeMux) {
 func spotifyRouting(handler *http.ServeMux) {
 	handler.Handle("/me/playlists", middleware.ApplyMiddlewares(MyPlaylistsHandler{}, LogMiddleware))
 	handler.Handle("/me/player/devices", middleware.ApplyMiddlewares(AvailableDevicesHandler{}, LogMiddleware))
+	handler.Handle("/me/player/", middleware.ApplyMiddlewares(PlaybackHandler{}, LogMiddleware))
 }

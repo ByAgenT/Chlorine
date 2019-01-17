@@ -25,7 +25,8 @@ var (
 		spotify.ScopeUserReadEmail,
 		spotify.ScopeUserReadPrivate,
 		spotify.ScopePlaylistReadPrivate,
-		spotify.ScopeUserReadPlaybackState}
+		spotify.ScopeUserReadPlaybackState,
+		spotify.ScopeUserModifyPlaybackState}
 	secretKey = os.Getenv("SECRET_KEY")
 )
 

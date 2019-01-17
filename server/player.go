@@ -33,5 +33,23 @@ func (h AvailableDevicesHandler) ServeHTTP(w http.ResponseWriter, r *http.Reques
 type PlaybackHandler SessionedHandler
 
 func (h PlaybackHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	h.InitSession(r)
+	jsonWriter := JSONResponseWriter{w}
 
+	client, err := InitSpotifyClientFromSession(h.GetSession())
+	if err != nil {
+		log.Printf("server: PlaybackHandler: error initializing Spotify client: %s", err)
+		jsonWriter.Error(apierror.APIErrorUnauthorized, http.StatusForbidden)
+		return
+	}
+
+	switch r.Method {
+	case "GET":
+		playerState, err := client.PlayerState()
+		if err != nil {
+			log.Printf("server: PlaybackHandler: error retrieving PlayerState: %s", err)
+			jsonWriter.Error(apierror.APIErrorUnauthorized, http.StatusForbidden)
+		}
+		jsonWriter.WriteJSONObject(playerState)
+	}
 }
