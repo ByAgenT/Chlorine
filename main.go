@@ -1,7 +1,7 @@
 package main
 
 import (
-	"akovalyov/chlorine/server"
+	"chlorine/server"
 	"fmt"
 	"log"
 )

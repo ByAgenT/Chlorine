@@ -1,8 +1,8 @@
 package server
 
 import (
-	"akovalyov/chlorine/apierror"
-	"akovalyov/chlorine/auth"
+	"chlorine/apierror"
+	"chlorine/auth"
 	"log"
 	"net/http"
 )

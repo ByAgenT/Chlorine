@@ -1,7 +1,7 @@
 package server
 
 import (
-	"akovalyov/chlorine/middleware"
+	"chlorine/middleware"
 	"net/http"
 )
 

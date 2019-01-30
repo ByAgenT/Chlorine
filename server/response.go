@@ -1,7 +1,7 @@
 package server
 
 import (
-	"akovalyov/chlorine/apierror"
+	"chlorine/apierror"
 	"encoding/json"
 	"net/http"
 )

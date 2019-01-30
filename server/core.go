@@ -1,7 +1,7 @@
 package server
 
 import (
-	"akovalyov/chlorine/auth"
+	"chlorine/auth"
 	"encoding/gob"
 	"log"
 	"net/http"
