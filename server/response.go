@@ -1,9 +1,10 @@
 package server
 
 import (
-	"akovalyov/chlorine/apierror"
 	"encoding/json"
 	"net/http"
+
+	"dev.azure.com/specopsbunnies/chlorine/apierror"
 )
 
 // JSONResponseWriter structure adds methods to write JSON to the ResponseWriter.

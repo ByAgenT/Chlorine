@@ -1,8 +1,9 @@
 package server
 
 import (
-	"akovalyov/chlorine/middleware"
 	"net/http"
+
+	"dev.azure.com/specopsbunnies/chlorine/middleware"
 )
 
 // GetApplicationHandler create ServeMux instance with all applicaion routes.

@@ -1,12 +1,12 @@
 package server
 
 import (
-	"akovalyov/chlorine/auth"
 	"encoding/gob"
 	"log"
 	"net/http"
 	"time"
 
+	"dev.azure.com/specopsbunnies/chlorine/auth"
 	"github.com/gorilla/sessions"
 	"github.com/zmb3/spotify"
 )

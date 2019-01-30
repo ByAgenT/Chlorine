@@ -1,10 +1,11 @@
 package server
 
 import (
-	"akovalyov/chlorine/apierror"
-	"akovalyov/chlorine/auth"
 	"log"
 	"net/http"
+
+	"dev.azure.com/specopsbunnies/chlorine/apierror"
+	"dev.azure.com/specopsbunnies/chlorine/auth"
 )
 
 // LoginHandler initiates Chlorine room and start OAuth2 authentication flow for Spotify.
