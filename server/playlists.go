@@ -1,10 +1,9 @@
 package server
 
 import (
+	"chlorine/apierror"
 	"log"
 	"net/http"
-
-	"dev.azure.com/specopsbunnies/chlorine/apierror"
 )
 
 // MyPlaylistsHandler is a handler for user's personal playlists in Spotify

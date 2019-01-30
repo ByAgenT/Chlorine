@@ -1,10 +1,9 @@
 package main
 
 import (
+	"chlorine/server"
 	"fmt"
 	"log"
-
-	"dev.azure.com/specopsbunnies/chlorine/server"
 )
 
 const (
