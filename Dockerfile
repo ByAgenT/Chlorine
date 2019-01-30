@@ -5,10 +5,6 @@ ADD . ./
 
 # Install project dependencies
 RUN go get -d
-# RUN go get golang.org/x/oauth2/
-# RUN go get github.com/gorilla/mux
-# RUN go get github.com/gorilla/sessions
-# RUN go get github.com/zmb3/spotify
 
 # Compile application
 RUN CGO_ENABLED=0 go build -o app
