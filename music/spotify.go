@@ -13,7 +13,8 @@ import (
 // SpotifySessionAuthentication provides authentication for the Spotify using information from the session.
 type SpotifySessionAuthentication struct{}
 
-func (s SpotifySessionAuthentication) GetAuth(session *sessions.Session) (Authenticator, error) {
+// GetAuth returns SpotifyAuthenticator populates with OAuth token from session.
+func (s SpotifySessionAuthentication) GetAuth(session *sessions.Session) (auth.Authenticator, error) {
 	token, err := auth.GetTokenFromSession(session)
 	if err != nil {
 		return nil, err
@@ -29,12 +30,8 @@ type SpotifyAuthenticator struct {
 // SpotifyService is a service for authenticating and work with Spotify music service.
 type SpotifyService struct{}
 
-// SpotifyClient is a client for interacting with Spotify music service.
-type SpotifyClient struct {
-	client *spotify.Client
-}
-
-func (s SpotifyService) Authenticate(authenticator Authenticator) (Client, error) {
+// Authenticate provides authenticator for the Spotify and return Client for Spotify.
+func (s SpotifyService) Authenticate(authenticator auth.Authenticator) (Client, error) {
 	spotifyAuth := auth.GetSpotifyAuthenticator()
 	oauthAuthenticator, ok := authenticator.(SpotifyAuthenticator)
 	if !ok {
@@ -45,7 +42,31 @@ func (s SpotifyService) Authenticate(authenticator Authenticator) (Client, error
 	return spotifyClient, nil
 }
 
+// SpotifyClient is a client for interacting with Spotify music service.
+type SpotifyClient struct {
+	client *spotify.Client
+}
+
+// CurrentUsersPlaylists returns playlists from the Spotify API.
 func (c SpotifyClient) CurrentUsersPlaylists() (*spotify.SimplePlaylistPage, error) {
 	playlist, err := c.client.CurrentUsersPlaylists()
 	return playlist, err
+}
+
+// PlayerDevices returns available devices for the playback.
+func (c SpotifyClient) PlayerDevices() ([]spotify.PlayerDevice, error) {
+	devices, err := c.client.PlayerDevices()
+	return devices, err
+}
+
+// PlayerState returns current player state.
+func (c SpotifyClient) PlayerState() (*spotify.PlayerState, error) {
+	playerState, err := c.client.PlayerState()
+	return playerState, err
+}
+
+// TransferPlayback transfer playback to another player by a ID.
+func (c SpotifyClient) TransferPlayback(id spotify.ID, play bool) error {
+	err := c.client.TransferPlayback(id, play)
+	return err
 }

@@ -2,6 +2,7 @@ package server
 
 import (
 	"chlorine/auth"
+	"chlorine/music"
 	"encoding/gob"
 	"log"
 	"net/http"
@@ -11,10 +12,24 @@ import (
 	"github.com/zmb3/spotify"
 )
 
-// SessionedHandler implements Handler interface and compose Session fields and methods
-type SessionedHandler struct {
-	http.Handler
+// ExternalMusicHandler contains external MusicService and authentication provider for it to retrieve music information.
+type ExternalMusicHandler struct {
 	auth.Session
+	MusicService           music.Service
+	AuthenticationProvider auth.SessionAuthenticaton
+}
+
+// GetClient return authenticate music service and return client instance.
+func (h ExternalMusicHandler) GetClient(session *sessions.Session) (music.Client, error) {
+	authenticator, err := h.AuthenticationProvider.GetAuth(session)
+	if err != nil {
+		return nil, err
+	}
+	client, err := h.MusicService.Authenticate(authenticator)
+	if err != nil {
+		return nil, err
+	}
+	return client, nil
 }
 
 // StartChlorineServer starts Chlorine to listen to HTTP connections on the given port.
