@@ -8,15 +8,17 @@ import (
 )
 
 // LoginHandler initiates Chlorine room and start OAuth2 authentication flow for Spotify.
-type LoginHandler SessionedHandler
+type LoginHandler struct {
+	auth.Session
+}
 
 func (h LoginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	h.InitSession(r)
+	session := h.InitSession(r)
 
 	authenticator := auth.GetSpotifyAuthenticator()
-	state := auth.CreateRandomState(h.GetSession())
-	h.GetSession().Values["CSRFState"] = state
-	err := h.GetSession().Save(r, w)
+	state := auth.CreateRandomState(session)
+	session.Values["CSRFState"] = state
+	err := session.Save(r, w)
 	if err != nil {
 		log.Printf("server: handleLogin: error saving session: %s", err)
 	}
@@ -24,20 +26,22 @@ func (h LoginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 // CompleteAuthHandler receives result from Spotify authorization and finishes authentication flow.
-type CompleteAuthHandler SessionedHandler
+type CompleteAuthHandler struct {
+	auth.Session
+}
 
 func (h CompleteAuthHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	h.InitSession(r)
+	session := h.InitSession(r)
 
-	token, err := auth.ProcessReceivedToken(r, h.GetSession())
+	token, err := auth.ProcessReceivedToken(r, session)
 	if err != nil {
 		log.Printf("server: completeAuth: token process error: %s", err)
 		http.Error(w, "Authentication error", http.StatusForbidden)
 		return
 	}
 
-	auth.WriteTokenToSession(h.GetSession(), token)
-	err = h.GetSession().Save(r, w)
+	auth.WriteTokenToSession(session, token)
+	err = session.Save(r, w)
 	if err != nil {
 		log.Printf("server: completeAuth: error saving session: %s", err)
 	}
@@ -46,20 +50,22 @@ func (h CompleteAuthHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 // SpotifyTokenHandler returns Spotify authentication token from authorized user.
-type SpotifyTokenHandler SessionedHandler
+type SpotifyTokenHandler struct {
+	auth.Session
+}
 
 func (h SpotifyTokenHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	h.InitSession(r)
+	session := h.InitSession(r)
 	jsonWriter := JSONResponseWriter{w}
 
-	token, err := auth.GetTokenFromSession(h.GetSession())
+	token, err := auth.GetTokenFromSession(session)
 	if err != nil {
 		log.Printf("server: spotifyToken: error retrieving token from session: %s", err)
 		jsonWriter.Error(apierror.APIErrorUnauthorized, http.StatusForbidden)
 		return
 	}
 
-	err = h.GetSession().Save(r, w)
+	err = session.Save(r, w)
 	if err != nil {
 		log.Printf("server: spotifyToken: cannot save session: %s", err)
 	}

@@ -11,19 +11,19 @@ import (
 )
 
 // AvailableDevicesHandler is a handler of a list of user's available devices.
-type AvailableDevicesHandler SessionedHandler
+type AvailableDevicesHandler struct {
+	ExternalMusicHandler
+}
 
 func (h AvailableDevicesHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	h.InitSession(r)
+	session := h.InitSession(r)
 	jsonWriter := JSONResponseWriter{w}
 
-	client, err := InitSpotifyClientFromSession(h.GetSession())
+	client, err := h.GetClient(session)
 	if err != nil {
-		log.Printf("server: AvailableDevicesHandler: error initializing Spotify client: %s", err)
 		jsonWriter.Error(apierror.APIErrorUnauthorized, http.StatusForbidden)
 		return
 	}
-
 	devices, err := client.PlayerDevices()
 	if err != nil {
 		log.Printf("server: AvailableDevicesHandler: error retrieving devices from spotify: %s", err)
@@ -34,15 +34,16 @@ func (h AvailableDevicesHandler) ServeHTTP(w http.ResponseWriter, r *http.Reques
 }
 
 // PlaybackHandler is a handler for Spotify playback actions.
-type PlaybackHandler SessionedHandler
+type PlaybackHandler struct {
+	ExternalMusicHandler
+}
 
 func (h PlaybackHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	h.InitSession(r)
+	session := h.InitSession(r)
 	jsonWriter := JSONResponseWriter{w}
 
-	client, err := InitSpotifyClientFromSession(h.GetSession())
+	client, err := h.GetClient(session)
 	if err != nil {
-		log.Printf("server: PlaybackHandler: error initializing Spotify client: %s", err)
 		jsonWriter.Error(apierror.APIErrorUnauthorized, http.StatusForbidden)
 		return
 	}

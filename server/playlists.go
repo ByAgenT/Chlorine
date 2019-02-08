@@ -7,15 +7,16 @@ import (
 )
 
 // MyPlaylistsHandler is a handler for user's personal playlists in Spotify
-type MyPlaylistsHandler SessionedHandler
+type MyPlaylistsHandler struct {
+	ExternalMusicHandler
+}
 
 func (h MyPlaylistsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	h.InitSession(r)
+	session := h.InitSession(r)
 	jsonWriter := JSONResponseWriter{w}
 
-	client, err := InitSpotifyClientFromSession(h.GetSession())
+	client, err := h.GetClient(session)
 	if err != nil {
-		log.Printf("server: MyPlaylistsHandler: error initializing Spotify client: %s", err)
 		jsonWriter.Error(apierror.APIErrorUnauthorized, http.StatusForbidden)
 		return
 	}
