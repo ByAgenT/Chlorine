@@ -16,4 +16,4 @@ chlorine
 *.out
 
 
-.env
+*.env
