@@ -3,13 +3,25 @@ package server
 import (
 	"chlorine/auth"
 	"chlorine/music"
+	"chlorine/storage"
 	"encoding/gob"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/gorilla/sessions"
 	"github.com/zmb3/spotify"
+)
+
+var (
+	dbStorage *storage.Storage
+	dbConfig  = storage.DatabaseConfig{
+		Host:     os.Getenv("MYSQL_HOST"),
+		Port:     os.Getenv("MYSQL_PORT"),
+		User:     os.Getenv("MYSQL_USER"),
+		Password: os.Getenv("MYSQL_PASSWORD"),
+		Name:     os.Getenv("MYSQL_DATABASE")}
 )
 
 // ExternalMusicHandler contains external MusicService and authentication provider for it to retrieve music information.
@@ -34,6 +46,7 @@ func (h ExternalMusicHandler) GetClient(session *sessions.Session) (music.Client
 
 // StartChlorineServer starts Chlorine to listen to HTTP connections on the given port.
 func StartChlorineServer(port string) {
+	dbStorage = storage.ConnectDatabase(dbConfig)
 	handler := GetApplicationHandler()
 	err := http.ListenAndServe(port, handler)
 	if err != nil {
