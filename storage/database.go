@@ -7,13 +7,21 @@ import (
 	"log"
 	"time"
 
-	// Use MySQL driver
-	_ "github.com/go-sql-driver/mysql"
+	// Use Postgres driver
+	_ "github.com/lib/pq"
 )
 
-// Storage is a main object that provides database functionality.
-type Storage struct {
+// ID represents serial identification number of object in storage.
+type ID int
+
+// DBStorage is a main object that provides database functionality.
+type DBStorage struct {
 	db *sql.DB
+}
+
+// Query prepares and exececutes SQL query.
+func (s DBStorage) Query(query string, args ...interface{}) (*sql.Rows, error) {
+	return s.db.Query(query, args)
 }
 
 // DatabaseConfig contains necessary configuration strings used for database initialization.
@@ -34,14 +42,14 @@ const (
 )
 
 // ConnectDatabase tries to connect to the database and returns Storage, otherwise panic after a timeout.
-func ConnectDatabase(dbConfig DatabaseConfig) *Storage {
+func ConnectDatabase(dbConfig DatabaseConfig) *DBStorage {
 	connString := constructConnectionString(dbConfig.Host, dbConfig.User, dbConfig.Password, dbConfig.Port, dbConfig.Name)
 	db := initDatabase(connString)
-	return &Storage{db: db}
+	return &DBStorage{db: db}
 }
 
 func constructConnectionString(host string, user string, password string, port string, db string) string {
-	return fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", user, password, host, port, db)
+	return fmt.Sprintf("host=%s port=%s dbname=%s user=%s password=%s sslmode=disable", host, port, db, user, password)
 }
 
 func initDatabase(conn string) *sql.DB {
@@ -49,7 +57,7 @@ func initDatabase(conn string) *sql.DB {
 	ctx, cancel := context.WithTimeout(context.Background(), ConnectionTimeout*time.Second)
 	defer cancel()
 	var err error
-	db, err = sql.Open("mysql", conn)
+	db, err = sql.Open("postgres", conn)
 	if err != nil {
 		panic("server: storage: could not open database connection")
 	}
@@ -63,7 +71,7 @@ func initDatabase(conn string) *sql.DB {
 				log.Printf("server: connected to database.")
 				return db
 			}
-			log.Printf("server: storage: cannot connect to database, retrying in %d seconds.", RetryCooldown)
+			log.Printf("server: storage: cannot connect to database: %s. retrying in %d seconds.", err, RetryCooldown)
 			time.Sleep(RetryCooldown * time.Second)
 		}
 	}
