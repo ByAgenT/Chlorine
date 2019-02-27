@@ -15,13 +15,13 @@ import (
 )
 
 var (
-	dbStorage *storage.Storage
+	dbStorage *storage.DBStorage
 	dbConfig  = storage.DatabaseConfig{
-		Host:     os.Getenv("MYSQL_HOST"),
-		Port:     os.Getenv("MYSQL_PORT"),
-		User:     os.Getenv("MYSQL_USER"),
-		Password: os.Getenv("MYSQL_PASSWORD"),
-		Name:     os.Getenv("MYSQL_DATABASE")}
+		Host:     os.Getenv("POSTGRES_HOST"),
+		Port:     os.Getenv("POSTGRES_PORT"),
+		User:     os.Getenv("POSTGRES_USER"),
+		Password: os.Getenv("POSTGRES_PASSWORD"),
+		Name:     os.Getenv("POSTGRES_DATABASE")}
 )
 
 // ExternalMusicHandler contains external MusicService and authentication provider for it to retrieve music information.
