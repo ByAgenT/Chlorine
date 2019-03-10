@@ -2,6 +2,7 @@ package auth
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/gorilla/sessions"
@@ -44,6 +45,7 @@ func createStore() *sessions.CookieStore {
 	store := sessions.NewCookieStore([]byte(secretKey))
 	store.Options.HttpOnly = true
 	store.Options.Path = "/"
+	store.Options.MaxAge = 0
 
 	return store
 }
@@ -52,7 +54,7 @@ func createStore() *sessions.CookieStore {
 func InitSession(r *http.Request) *sessions.Session {
 	session, err := sessionStore.Get(r, DefaultSessionName)
 	if err != nil {
-		panic(err)
+		log.Fatalf("auth: session: %s", err.Error())
 	}
 	return session
 }
