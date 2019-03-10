@@ -10,20 +10,29 @@ var (
 	musicService           = &music.SpotifyService{}
 	authenticationProvider = &music.SpotifySessionAuthentication{}
 	externalMusicHandler   = ExternalMusicHandler{MusicService: musicService, AuthenticationProvider: authenticationProvider}
+	storageHandler         = StorageHandler{}
 )
 
-// GetApplicationHandler create ServeMux instance with all applicaion routes.
+// GetApplicationHandler injects application routes and services into ServeMux and returns it.
 func GetApplicationHandler() *http.ServeMux {
 	handler := http.NewServeMux()
+	storageHandler.storage = dbStorage
+
 	authRouting(handler)
 	spotifyRouting(handler)
+	chlorineRouting(handler)
+
 	return handler
 }
 
 func authRouting(handler *http.ServeMux) {
-	handler.Handle("/login", middleware.ApplyMiddlewares(LoginHandler{}, LogMiddleware))
-	handler.Handle("/authcomplete", CompleteAuthHandler{})
-	handler.Handle("/token", middleware.ApplyMiddlewares(SpotifyTokenHandler{}, LogMiddleware))
+	loginHandler := LoginHandler{StorageHandler: storageHandler}
+	completeAuthHandler := CompleteAuthHandler{StorageHandler: storageHandler}
+	spotifyTokenHandler := SpotifyTokenHandler{}
+
+	handler.Handle("/login", injectMiddlewares(loginHandler))
+	handler.Handle("/authcomplete", injectMiddlewares(completeAuthHandler))
+	handler.Handle("/token", injectMiddlewares(spotifyTokenHandler))
 }
 
 func spotifyRouting(handler *http.ServeMux) {
@@ -34,6 +43,11 @@ func spotifyRouting(handler *http.ServeMux) {
 	handler.Handle("/me/playlists", injectMiddlewares(playlistsHandler))
 	handler.Handle("/me/player/devices", injectMiddlewares(availableDevicesHandler))
 	handler.Handle("/me/player/", injectMiddlewares(playbackHandler))
+}
+
+func chlorineRouting(handler *http.ServeMux) {
+	roomHandler := RoomHandler{StorageHandler: storageHandler}
+	handler.Handle("/rooms", injectMiddlewares(roomHandler))
 }
 
 func injectMiddlewares(h http.Handler) http.Handler {

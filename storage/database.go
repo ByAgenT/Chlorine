@@ -29,17 +29,17 @@ type DBStorage struct {
 
 // Query prepares and exececutes SQL query and return rows fetched from the database.
 func (s DBStorage) Query(query string, args ...interface{}) (*sql.Rows, error) {
-	return s.db.Query(query, args)
+	return s.db.Query(query, args...)
 }
 
 // QueryRow prepare and execute SQL query and expects to return only one row.
 func (s DBStorage) QueryRow(query string, args ...interface{}) *sql.Row {
-	return s.db.QueryRow(query, args)
+	return s.db.QueryRow(query, args...)
 }
 
 // Exec prepares and executes SQL query and return summarized result of SQL statement execution.
 func (s DBStorage) Exec(query string, args ...interface{}) (sql.Result, error) {
-	return s.db.Exec(query, args)
+	return s.db.Exec(query, args...)
 }
 
 // DatabaseConfig contains necessary configuration strings used for database initialization.

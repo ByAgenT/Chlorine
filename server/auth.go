@@ -3,6 +3,7 @@ package server
 import (
 	"chlorine/apierror"
 	"chlorine/auth"
+	"chlorine/storage"
 	"log"
 	"net/http"
 )
@@ -43,6 +44,17 @@ func (h CompleteAuthHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	auth.WriteTokenToSession(session, token)
+
+	spotifyToken := &storage.SpotifyToken{
+		AccessToken:  token.AccessToken,
+		Expiry:       token.Expiry,
+		RefreshToken: token.RefreshToken,
+		TokenType:    token.TokenType}
+	err = h.storage.SaveToken(spotifyToken)
+	if err != nil {
+		log.Printf("server: completeAuth: %s", err)
+	}
+
 	err = session.Save(r, w)
 	if err != nil {
 		log.Printf("server: completeAuth: error saving session: %s", err)
