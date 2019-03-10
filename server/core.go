@@ -31,6 +31,11 @@ type ExternalMusicHandler struct {
 	AuthenticationProvider auth.SessionAuthenticaton
 }
 
+// StorageHandler contains database provider and allow handlers to work with storage.
+type StorageHandler struct {
+	storage *storage.DBStorage
+}
+
 // GetClient return authenticate music service and return client instance.
 func (h ExternalMusicHandler) GetClient(session *sessions.Session) (music.Client, error) {
 	authenticator, err := h.AuthenticationProvider.GetAuth(session)

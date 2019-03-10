@@ -11,6 +11,14 @@ import (
 	_ "github.com/lib/pq"
 )
 
+const (
+	// RetryCooldown is amount of second the system will wait before next database ping.
+	RetryCooldown = 1
+
+	// ConnectionTimeout total amount of time after which system will terminate with panic.
+	ConnectionTimeout = 20
+)
+
 // ID represents serial identification number of object in storage.
 type ID int
 
@@ -19,9 +27,19 @@ type DBStorage struct {
 	db *sql.DB
 }
 
-// Query prepares and exececutes SQL query.
+// Query prepares and exececutes SQL query and return rows fetched from the database.
 func (s DBStorage) Query(query string, args ...interface{}) (*sql.Rows, error) {
 	return s.db.Query(query, args)
+}
+
+// QueryRow prepare and execute SQL query and expects to return only one row.
+func (s DBStorage) QueryRow(query string, args ...interface{}) *sql.Row {
+	return s.db.QueryRow(query, args)
+}
+
+// Exec prepares and executes SQL query and return summarized result of SQL statement execution.
+func (s DBStorage) Exec(query string, args ...interface{}) (sql.Result, error) {
+	return s.db.Exec(query, args)
 }
 
 // DatabaseConfig contains necessary configuration strings used for database initialization.
@@ -32,14 +50,6 @@ type DatabaseConfig struct {
 	Name     string
 	Password string
 }
-
-const (
-	// RetryCooldown is amount of second the system will wait before next database ping.
-	RetryCooldown = 1
-
-	// ConnectionTimeout total amount of time after which system will terminate with panic.
-	ConnectionTimeout = 20
-)
 
 // ConnectDatabase tries to connect to the database and returns Storage, otherwise panic after a timeout.
 func ConnectDatabase(dbConfig DatabaseConfig) *DBStorage {
