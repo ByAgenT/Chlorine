@@ -22,6 +22,9 @@ const (
 // ID represents serial identification number of object in storage.
 type ID int
 
+// Reference represents foreign key in the database entry.
+type Reference ID
+
 // DBStorage is a main object that provides database functionality.
 type DBStorage struct {
 	db *sql.DB

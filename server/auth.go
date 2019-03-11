@@ -3,6 +3,7 @@ package server
 import (
 	"chlorine/apierror"
 	"chlorine/auth"
+	"chlorine/cl"
 	"chlorine/storage"
 	"log"
 	"net/http"
@@ -50,7 +51,12 @@ func (h CompleteAuthHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		Expiry:       token.Expiry,
 		RefreshToken: token.RefreshToken,
 		TokenType:    token.TokenType}
-	err = h.storage.SaveToken(spotifyToken)
+
+	roomConfig := &storage.RoomConfig{
+		SongsPerMember: 5,
+		MaxMembers:     10}
+
+	_, err = cl.CreateRoom(spotifyToken, roomConfig, h.storage)
 	if err != nil {
 		log.Printf("server: completeAuth: %s", err)
 	}

@@ -34,3 +34,14 @@ func (s DBStorage) SaveToken(token *SpotifyToken) error {
 	}
 	return nil
 }
+
+// RetrieveToken fetches token entry with the provided ID from the database.
+func (s DBStorage) RetrieveToken(id ID) (*SpotifyToken, error) {
+	token := new(SpotifyToken)
+	err := s.QueryRow("SELECT id, access_token, expiry, refresh_token, token_type FROM room WHERE id = $1", id).Scan(
+		&token.ID, &token.AccessToken, &token.Expiry, &token.RefreshToken, &token.TokenType)
+	if err != nil {
+		return nil, err
+	}
+	return token, nil
+}
