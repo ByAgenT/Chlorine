@@ -1,0 +1,3 @@
+[submodule "chlorine-web"]
+	path = chlorine-web
+	url = git@ssh.dev.azure.com:v3/specopsbunnies/Chlorine/chlorine-web
