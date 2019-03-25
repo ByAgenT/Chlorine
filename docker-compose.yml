@@ -8,6 +8,17 @@ services:
       - "5432:5432"
     env_file:
       - .env
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - web
+      - app
     
   app:
     build: .
@@ -19,3 +30,8 @@ services:
       - .env
     depends_on:
       - db
+
+  web:
+    build: ./chlorine-web
+    ports:
+      - "3000:3000"

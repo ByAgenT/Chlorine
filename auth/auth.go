@@ -16,7 +16,7 @@ import (
 
 const (
 	// AuthCallback used by Spotify OAuth for complete authorization flow and receive token.
-	AuthCallback = "http://localhost:8080/authcomplete"
+	AuthCallback = "http://localhost/authcomplete"
 )
 
 var (
