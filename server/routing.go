@@ -47,7 +47,10 @@ func spotifyRouting(handler *http.ServeMux) {
 
 func chlorineRouting(handler *http.ServeMux) {
 	roomHandler := RoomHandler{StorageHandler: storageHandler}
+	memberHandler := MemberHandler{StorageHandler: storageHandler}
+
 	handler.Handle("/rooms", injectMiddlewares(roomHandler))
+	handler.Handle("/member", injectMiddlewares(memberHandler))
 }
 
 func injectMiddlewares(h http.Handler) http.Handler {
