@@ -57,7 +57,7 @@ func (s DBStorage) SaveRoom(room *Room) error {
 		room.ID = &id
 		return nil
 	}
-	_, err := s.Exec("UPDATE room SET config_id=$1, spotify_token=$2 WHERE id = 1", room.ConfigID, room.SpotifyTokenID)
+	_, err := s.Exec("UPDATE room SET config_id=$2, spotify_token=$3 WHERE id = $1", room.ID, room.ConfigID, room.SpotifyTokenID)
 	if err != nil {
 		return err
 	}
@@ -79,7 +79,7 @@ func (s DBStorage) SaveRoomConfig(rc *RoomConfig) error {
 		rc.ID = &id
 		return nil
 	}
-	_, err := s.Exec("UPDATE room_config SET songs_per_member=$1, max_members=$2 WHERE id = 1", rc.SongsPerMember, rc.MaxMembers)
+	_, err := s.Exec("UPDATE room_config SET songs_per_member=$2, max_members=$3 WHERE id = $1", rc.ID, rc.SongsPerMember, rc.MaxMembers)
 	if err != nil {
 		return err
 	}
