@@ -3,6 +3,7 @@ package server
 import (
 	"chlorine/apierror"
 	"chlorine/auth"
+	"chlorine/storage"
 	"log"
 	"net/http"
 )
@@ -14,13 +15,26 @@ type RoomHandler struct {
 }
 
 func (h RoomHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	h.InitSession(r)
+	session := h.InitSession(r)
 	jsonWriter := JSONResponseWriter{w}
 
-	rooms, err := h.storage.GetRooms()
-	if err != nil {
-		log.Printf("server: RoomHandler: %s", err.Error())
-		jsonWriter.Error(apierror.APIServerError, 500)
+	switch r.Method {
+	case "GET":
+		memberID, ok := session.Values["MemberID"].(storage.ID)
+		if !ok {
+			jsonWriter.Error(apierror.APIErrorUnauthorized, http.StatusUnauthorized)
+		}
+		member, err := h.storage.GetMember(memberID)
+		if err != nil {
+			log.Printf("server: MemberHandler: cannot retrieve member: %s", err)
+		}
+		room, err := h.storage.GetRoom(storage.ID(member.RoomID))
+		if err != nil {
+			log.Printf("server: RoomHandler: %s", err.Error())
+			jsonWriter.Error(apierror.APIServerError, 500)
+		}
+		jsonWriter.WriteJSONObject(room)
+		return
 	}
-	jsonWriter.WriteJSONObject(rooms)
+
 }

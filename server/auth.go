@@ -56,11 +56,14 @@ func (h CompleteAuthHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		SongsPerMember: 5,
 		MaxMembers:     10}
 
-	_, err = cl.CreateRoom(spotifyToken, roomConfig, h.storage)
+	room, err := cl.CreateRoom(spotifyToken, roomConfig, h.storage)
 	if err != nil {
 		log.Printf("server: completeAuth: %s", err)
 	}
 
+	member, err := cl.CreateMember("Host", int(*room.ID), storage.RoleAdmin, h.storage)
+
+	session.Values["MemberID"] = member.ID
 	err = session.Save(r, w)
 	if err != nil {
 		log.Printf("server: completeAuth: error saving session: %s", err)

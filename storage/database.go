@@ -30,6 +30,11 @@ type DBStorage struct {
 	db *sql.DB
 }
 
+// Model is a structure that store necessary information related to Model processing
+type Model struct {
+	storage *DBStorage
+}
+
 // Query prepares and exececutes SQL query and return rows fetched from the database.
 func (s DBStorage) Query(query string, args ...interface{}) (*sql.Rows, error) {
 	return s.db.Query(query, args...)

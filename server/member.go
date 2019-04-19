@@ -4,6 +4,7 @@ import (
 	"chlorine/apierror"
 	"chlorine/auth"
 	"chlorine/cl"
+	"chlorine/storage"
 	"encoding/json"
 	"io/ioutil"
 	"log"
@@ -21,6 +22,17 @@ func (h MemberHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	jsonWriter := JSONResponseWriter{w}
 
 	switch r.Method {
+	case "GET":
+		memberID, ok := session.Values["MemberID"].(storage.ID)
+		if !ok {
+			jsonWriter.Error(apierror.APIErrorUnauthorized, http.StatusUnauthorized)
+		}
+		member, err := h.storage.GetMember(memberID)
+		if err != nil {
+			log.Printf("server: MemberHandler: cannot retrieve member: %s", err)
+		}
+		jsonWriter.WriteJSONObject(member)
+		return
 	case "POST":
 		body, err := ioutil.ReadAll(r.Body)
 		defer r.Body.Close()
@@ -39,14 +51,17 @@ func (h MemberHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			jsonWriter.Error(apierror.APIInvalidRequest, http.StatusBadRequest)
 			return
 		}
-		member, err := cl.CreateMember(memberData.Name, memberData.RoomID, false, h.storage)
+		member, err := cl.CreateMember(memberData.Name, memberData.RoomID, storage.RoleMember, h.storage)
 		if err != nil {
 			log.Printf("server: MemberHandler: cannot create member: %s", err)
 			jsonWriter.Error(apierror.APIServerError, http.StatusInternalServerError)
 			return
 		}
 		session.Values["MemberID"] = member.ID
-		session.Save(r, w)
+		err = session.Save(r, w)
+		if err != nil {
+			log.Printf("server: MemberHandler: error saving session: %s", err)
+		}
 		jsonWriter.WriteHeader(http.StatusCreated)
 		return
 	}

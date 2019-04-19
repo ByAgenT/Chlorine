@@ -42,6 +42,17 @@ func (s DBStorage) GetRooms() ([]Room, error) {
 	return rooms, nil
 }
 
+// GetRoom return specific room object by it's ID.
+func (s DBStorage) GetRoom(roomID ID) (*Room, error) {
+	room := &Room{}
+	err := s.QueryRow("SELECT id, spotify_token, config_id, created_date FROM room WHERE id = $1", roomID).Scan(
+		&room.ID, &room.SpotifyTokenID, &room.ConfigID, &room.CreatedDate)
+	if err != nil {
+		return nil, err
+	}
+	return room, nil
+}
+
 // SaveRoom performs inserting of a new entry into database if ID is not present
 // or performs update of an entry with the given ID in the Room object.
 func (s DBStorage) SaveRoom(room *Room) error {

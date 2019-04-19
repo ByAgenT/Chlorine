@@ -73,4 +73,5 @@ func InitSpotifyClientFromSession(s *sessions.Session) (*spotify.Client, error) 
 func init() {
 	gob.Register(&time.Time{})
 	gob.Register(&time.Location{})
+	gob.Register(storage.ID(0))
 }

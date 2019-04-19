@@ -49,7 +49,7 @@ func chlorineRouting(handler *http.ServeMux) {
 	roomHandler := RoomHandler{StorageHandler: storageHandler}
 	memberHandler := MemberHandler{StorageHandler: storageHandler}
 
-	handler.Handle("/rooms", injectMiddlewares(roomHandler))
+	handler.Handle("/room", injectMiddlewares(roomHandler))
 	handler.Handle("/member", injectMiddlewares(memberHandler))
 }
 
