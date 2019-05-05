@@ -17,4 +17,5 @@ type Client interface {
 	PlayerDevices() ([]spotify.PlayerDevice, error)
 	PlayerState() (*spotify.PlayerState, error)
 	TransferPlayback(spotify.ID, bool) error
+	Search(string, spotify.SearchType) (*spotify.SearchResult, error)
 }

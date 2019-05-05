@@ -70,3 +70,9 @@ func (c SpotifyClient) TransferPlayback(id spotify.ID, play bool) error {
 	err := c.client.TransferPlayback(id, play)
 	return err
 }
+
+// Search performs search within Spotify database.
+func (c SpotifyClient) Search(query string, t spotify.SearchType) (*spotify.SearchResult, error) {
+	searchResult, err := c.client.Search(query, t)
+	return searchResult, err
+}
