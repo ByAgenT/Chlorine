@@ -54,6 +54,7 @@ func (s DBStorage) GetMember(memberID ID) (*Member, error) {
 	member := &Member{}
 	err := s.QueryRow("SELECT id, name, room_id, role, created_date FROM member WHERE id = $1", memberID).Scan(
 		&member.ID, &member.Name, &member.RoomID, &member.Role, &member.CreatedDate)
+	member.storage = &s
 	if err != nil {
 		return nil, err
 	}

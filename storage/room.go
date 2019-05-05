@@ -5,6 +5,7 @@ import "time"
 // Room is a structural representation of a party room object. Party room have
 // own configuration and have Spotify token from owner to allow control music.
 type Room struct {
+	Model
 	ID             *ID       `json:"id,omitempty"`
 	SpotifyTokenID Reference `json:"spotify_token,omitempty"`
 	ConfigID       Reference `json:"config_id,omitempty"`
@@ -14,6 +15,7 @@ type Room struct {
 // RoomConfig is a config structure for rooms that contains meta information about
 // party room.
 type RoomConfig struct {
+	Model
 	ID             *ID       `json:"id,omitempty"`
 	SongsPerMember int       `json:"songs_per_member,omitempty"`
 	MaxMembers     int       `json:"max_members,omitempty"`
@@ -47,6 +49,7 @@ func (s DBStorage) GetRoom(roomID ID) (*Room, error) {
 	room := &Room{}
 	err := s.QueryRow("SELECT id, spotify_token, config_id, created_date FROM room WHERE id = $1", roomID).Scan(
 		&room.ID, &room.SpotifyTokenID, &room.ConfigID, &room.CreatedDate)
+	room.storage = &s
 	if err != nil {
 		return nil, err
 	}
@@ -95,4 +98,26 @@ func (s DBStorage) SaveRoomConfig(rc *RoomConfig) error {
 		return err
 	}
 	return nil
+}
+
+// GetMembers returns all members of the current room.
+func (r Room) GetMembers() ([]Member, error) {
+	rows, err := r.storage.Query("SELECT id, name, room_id, role, created_date FROM member WHERE room_id = $1", r.ID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	members := make([]Member, 0)
+	for rows.Next() {
+		member := Member{}
+		err := rows.Scan(&member.ID, &member.Name, &member.RoomID, &member.Role, &member.CreatedDate)
+		if err != nil {
+			return nil, err
+		}
+		members = append(members, member)
+	}
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+	return members, nil
 }
