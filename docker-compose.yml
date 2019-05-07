@@ -21,6 +21,16 @@ services:
     depends_on:
       - web
       - app
+
+  nginx-dev:
+    image: nginx:latest
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./nginx-development.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - app
     
   app:
     build: .
