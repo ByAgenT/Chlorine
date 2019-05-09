@@ -18,4 +18,7 @@ type Client interface {
 	PlayerState() (*spotify.PlayerState, error)
 	TransferPlayback(spotify.ID, bool) error
 	Search(string, spotify.SearchType) (*spotify.SearchResult, error)
+	CreatePlaylistForUser(userID, playlistName, description string, public bool) (*spotify.FullPlaylist, error)
+	AddTracksToPlaylist(playlistID spotify.ID, trackIDs ...spotify.ID) (snapshotID string, err error)
+	GetTracks(ids ...spotify.ID) ([]*spotify.FullTrack, error)
 }

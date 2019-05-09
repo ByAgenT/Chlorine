@@ -29,8 +29,8 @@ CREATE TABLE IF NOT EXISTS song
   id              SERIAL PRIMARY KEY,
   spotify_id      VARCHAR(255) NOT NULL,
   room_id         INT          NOT NULL REFERENCES room (id),
-  prev_song_id    INT REFERENCES song (id),
-  next_song_id    INT REFERENCES song (id),
+  prev_song_id    INT NULL REFERENCES song (id),
+  next_song_id    INT NULL REFERENCES song (id),
   member_added_id INT          NOT NULL,
   created_date    TIMESTAMP    NOT NULL DEFAULT NOW()
 );

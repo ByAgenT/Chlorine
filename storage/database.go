@@ -25,6 +25,9 @@ type ID int
 // Reference represents foreign key in the database entry.
 type Reference ID
 
+// NullReference represents nullable foreign key in the database.
+type NullReference sql.NullInt64
+
 // DBStorage is a main object that provides database functionality.
 type DBStorage struct {
 	db *sql.DB

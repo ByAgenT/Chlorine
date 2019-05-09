@@ -51,9 +51,13 @@ func chlorineRouting(handler *http.ServeMux) {
 	roomHandler := RoomHandler{StorageHandler: storageHandler}
 	memberHandler := MemberHandler{StorageHandler: storageHandler}
 	roomMembersHandler := RoomMembersHandler{StorageHandler: storageHandler}
+	roomSongsHanlder := RoomSongsHandler{StorageHandler: storageHandler, ExternalMusicHandler: externalMusicHandler}
+	roomSongsSpotifiedHandler := RoomsSongsSpotifiedHandler{StorageHandler: storageHandler, ExternalMusicHandler: externalMusicHandler}
 
 	handler.Handle("/room", injectMiddlewares(roomHandler))
 	handler.Handle("/room/members", injectMiddlewares(roomMembersHandler))
+	handler.Handle("/room/songs", injectMiddlewares(roomSongsHanlder))
+	handler.Handle("/room/songs/spotify", injectMiddlewares(roomSongsSpotifiedHandler))
 	handler.Handle("/member", injectMiddlewares(memberHandler))
 }
 

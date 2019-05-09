@@ -76,3 +76,29 @@ func (c SpotifyClient) Search(query string, t spotify.SearchType) (*spotify.Sear
 	searchResult, err := c.client.Search(query, t)
 	return searchResult, err
 }
+
+// CreatePlaylistForUser creates a playlist for a Spotify user.
+func (c SpotifyClient) CreatePlaylistForUser(userID, playlistName, description string, public bool) (*spotify.FullPlaylist, error) {
+	playlist, err := c.client.CreatePlaylistForUser(userID, playlistName, description, public)
+	return playlist, err
+}
+
+// AddTracksToPlaylist adds one or more tracks to a user's playlist.
+// This call requires ScopePlaylistModifyPublic or ScopePlaylistModifyPrivate.
+// A maximum of 100 tracks can be added per call.  It returns a snapshot ID that
+// can be used to identify this version (the new version) of the playlist in
+// future requests.
+func (c SpotifyClient) AddTracksToPlaylist(playlistID spotify.ID, trackIDs ...spotify.ID) (snapshotID string, err error) {
+	snapshotID, err = c.client.AddTracksToPlaylist(playlistID, trackIDs...)
+	return snapshotID, err
+}
+
+// GetTracks gets Spotify catalog information for multiple tracks based on their
+// Spotify IDs.  It supports up to 50 tracks in a single call.  Tracks are
+// returned in the order requested.  If a track is not found, that position in the
+// result will be nil.  Duplicate ids in the query will result in duplicate
+// tracks in the result.
+func (c SpotifyClient) GetTracks(ids ...spotify.ID) ([]*spotify.FullTrack, error) {
+	tracks, err := c.client.GetTracks(ids...)
+	return tracks, err
+}
