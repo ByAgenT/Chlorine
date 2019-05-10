@@ -57,6 +57,19 @@ func (h MemberHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			jsonWriter.Error(apierror.APIServerError, http.StatusInternalServerError)
 			return
 		}
+		token, err := h.storage.GetRoomToken(storage.ID(memberData.RoomID))
+		if err != nil {
+			log.Printf("server: MemberHandler: cannot retrieve token: %s", err)
+			jsonWriter.Error(apierror.APIServerError, http.StatusInternalServerError)
+			return
+		}
+		oauthToken, err := token.ToOAuthToken()
+		if err != nil {
+			log.Printf("server: MemberHandler: cannot convert token: %s", err)
+			jsonWriter.Error(apierror.APIServerError, http.StatusInternalServerError)
+			return
+		}
+		auth.WriteTokenToSession(session, oauthToken)
 		session.Values["MemberID"] = member.ID
 		err = session.Save(r, w)
 		if err != nil {

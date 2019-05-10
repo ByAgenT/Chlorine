@@ -69,7 +69,7 @@ func (h CompleteAuthHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		log.Printf("server: completeAuth: error saving session: %s", err)
 	}
 
-	http.Redirect(w, r, "/", http.StatusFound)
+	http.Redirect(w, r, "/player", http.StatusFound)
 }
 
 // SpotifyTokenHandler returns Spotify authentication token from authorized user.
