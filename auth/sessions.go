@@ -43,7 +43,7 @@ func (s *Session) InitSession(r *http.Request) *sessions.Session {
 
 func createStore() *sessions.CookieStore {
 	store := sessions.NewCookieStore([]byte(secretKey))
-	store.Options.HttpOnly = true
+	store.Options.HttpOnly = false
 	store.Options.Path = "/"
 	store.Options.MaxAge = 0
 

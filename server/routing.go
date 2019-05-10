@@ -40,10 +40,12 @@ func spotifyRouting(handler *http.ServeMux) {
 	availableDevicesHandler := AvailableDevicesHandler{ExternalMusicHandler: externalMusicHandler}
 	playbackHandler := PlaybackHandler{ExternalMusicHandler: externalMusicHandler}
 	searchSongHandler := SearchSongHandler{ExternalMusicHandler: externalMusicHandler}
+	spotifyPlayHandler := SpotifyPlayHandler{ExternalMusicHandler: externalMusicHandler}
 
 	handler.Handle("/me/playlists", injectMiddlewares(playlistsHandler))
 	handler.Handle("/me/player/devices", injectMiddlewares(availableDevicesHandler))
 	handler.Handle("/me/player/", injectMiddlewares(playbackHandler))
+	handler.Handle("/play", injectMiddlewares(spotifyPlayHandler))
 	handler.Handle("/search", injectMiddlewares(searchSongHandler))
 }
 

@@ -102,3 +102,9 @@ func (c SpotifyClient) GetTracks(ids ...spotify.ID) ([]*spotify.FullTrack, error
 	tracks, err := c.client.GetTracks(ids...)
 	return tracks, err
 }
+
+// PlayOpt is like Play but with more options.
+func (c SpotifyClient) PlayOpt(opt *spotify.PlayOptions) error {
+	err := c.client.PlayOpt(opt)
+	return err
+}
