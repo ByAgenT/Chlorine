@@ -47,3 +47,5 @@ services:
     build: ./chlorine-web
     ports:
       - "3000:3000"
+    environment:
+      - DEVELOPMENT_PROXY=http://nginx
