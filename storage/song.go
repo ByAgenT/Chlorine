@@ -25,19 +25,8 @@ func (s DBStorage) SaveSong(song *Song) error {
 
 		song.CreatedDate = time.Now().UTC()
 		var err error
-		// if song.PreviousSongID == 0 && song.NextSongID == 0 {
-		// 	err = s.QueryRow("INSERT INTO song (spotify_id, room_id, prev_song_id, next_song_id, member_added_id) VALUES ($1, $2, $3, $4, $5) RETURNING id",
-		// 		song.SpotifyID, song.RoomID, nil, nil, song.MemberAddedID).Scan(&id)
-		// } else if song.NextSongID == 0 {
-		// 	err = s.QueryRow("INSERT INTO song (spotify_id, room_id, prev_song_id, next_song_id, member_added_id) VALUES ($1, $2, $3, $4, $5) RETURNING id",
-		// 		song.SpotifyID, song.RoomID, song.PreviousSongID, nil, song.MemberAddedID).Scan(&id)
-		// } else if song.PreviousSongID == 0 {
-		// 	err = s.QueryRow("INSERT INTO song (spotify_id, room_id, prev_song_id, next_song_id, member_added_id) VALUES ($1, $2, $3, $4, $5) RETURNING id",
-		// 		song.SpotifyID, song.RoomID, nil, song.NextSongID, song.MemberAddedID).Scan(&id)
-		// } else {
 		err = s.QueryRow("INSERT INTO song (spotify_id, room_id, prev_song_id, next_song_id, member_added_id) VALUES ($1, $2, $3, $4, $5) RETURNING id",
 			song.SpotifyID, song.RoomID, song.PreviousSongID, song.NextSongID, song.MemberAddedID).Scan(&id)
-		// }
 		if err != nil {
 			return err
 		}
@@ -54,7 +43,8 @@ func (s DBStorage) SaveSong(song *Song) error {
 
 // GetRoomSongs fetches all song entries for a room from a database and return slice of Song objects.
 func (s DBStorage) GetRoomSongs(room *Room) ([]Song, error) {
-	rows, err := s.Query("SELECT id, spotify_id, room_id, prev_song_id, next_song_id, member_added_id FROM song WHERE room_id = $1 ORDER BY next_song_id", *room.ID)
+	query := "SELECT id, spotify_id, room_id, prev_song_id, next_song_id, member_added_id FROM song WHERE room_id = $1 ORDER BY next_song_id"
+	rows, err := s.Query(query, *room.ID)
 	if err != nil {
 		return nil, err
 	}
