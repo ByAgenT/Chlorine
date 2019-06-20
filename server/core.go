@@ -2,6 +2,7 @@ package server
 
 import (
 	"chlorine/auth"
+	"chlorine/middleware"
 	"chlorine/music"
 	"chlorine/storage"
 	"encoding/gob"
@@ -68,6 +69,10 @@ func InitSpotifyClientFromSession(s *sessions.Session) (*spotify.Client, error) 
 	}
 	client := authenticator.NewClient(token)
 	return &client, nil
+}
+
+func injectMiddlewares(h http.Handler) http.Handler {
+	return middleware.ApplyMiddlewares(h, LogMiddleware)
 }
 
 func init() {
