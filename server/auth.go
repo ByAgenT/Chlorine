@@ -5,6 +5,7 @@ import (
 	"chlorine/auth"
 	"chlorine/cl"
 	"chlorine/storage"
+	"context"
 	"log"
 	"net/http"
 )
@@ -17,15 +18,16 @@ type LoginHandler struct {
 
 func (h LoginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	session := h.InitSession(r)
+	jsonWriter := JSONResponseWriter{w}
 
-	authenticator := auth.GetSpotifyAuthenticator()
-	state := auth.CreateRandomState(session)
-	session.Values["CSRFState"] = state
+	authURL := cl.InitializeLogin(context.Background(), session)
 	err := session.Save(r, w)
 	if err != nil {
-		log.Printf("server: handleLogin: error saving session: %s", err)
+		log.Printf("unable to save session: %s", err)
+		jsonWriter.Error(apierror.APIServerError, http.StatusInternalServerError)
+		return
 	}
-	http.Redirect(w, r, authenticator.AuthURL(state), http.StatusFound)
+	http.Redirect(w, r, authURL, http.StatusFound)
 }
 
 // CompleteAuthHandler receives result from Spotify authorization and finishes authentication flow.
