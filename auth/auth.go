@@ -1,9 +1,13 @@
 package auth
 
 import (
+	"chlorine/cl"
+	"chlorine/storage"
+	"context"
 	"crypto/md5"
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"time"
@@ -122,4 +126,42 @@ func WriteTokenToSession(session *sessions.Session, token *oauth2.Token) {
 	session.Values["Expiry"] = &token.Expiry
 	session.Values["RefreshToken"] = token.RefreshToken
 	session.Values["TokenType"] = token.TokenType
+}
+
+// InitializeLogin setup initial login operations and return authentication URL.
+func InitializeLogin(ctx context.Context, session *sessions.Session) string {
+	authenticator := GetSpotifyAuthenticator()
+	state := CreateRandomState(session)
+	session.Values["CSRFState"] = state
+	return authenticator.AuthURL(state)
+}
+
+// FinishAuthentication completes OAuth flow and save token information
+func FinishAuthentication(ctx context.Context, r *http.Request, session *sessions.Session, db *storage.DBStorage) error {
+	token, err := ProcessReceivedToken(r, session)
+	if err != nil {
+		return fmt.Errorf("authentication: %s", err)
+	}
+
+	WriteTokenToSession(session, token)
+
+	spotifyToken := &storage.SpotifyToken{
+		AccessToken:  token.AccessToken,
+		Expiry:       token.Expiry,
+		RefreshToken: token.RefreshToken,
+		TokenType:    token.TokenType}
+
+	roomConfig := &storage.RoomConfig{
+		SongsPerMember: 5,
+		MaxMembers:     10}
+
+	room, err := cl.CreateRoom(spotifyToken, roomConfig, db)
+	if err != nil {
+		log.Printf("server: completeAuth: %s", err)
+	}
+
+	member, err := cl.CreateMember("Host", int(*room.ID), storage.RoleAdmin, db)
+	session.Values["MemberID"] = member.ID
+
+	return nil
 }
