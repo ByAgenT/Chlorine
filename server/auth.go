@@ -20,7 +20,7 @@ func (h LoginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	session := h.InitSession(r)
 	jsonWriter := JSONResponseWriter{w}
 
-	authURL := cl.InitializeLogin(context.Background(), session)
+	authURL := auth.InitializeLogin(context.Background(), session)
 	err := session.Save(r, w)
 	if err != nil {
 		log.Printf("unable to save session: %s", err)
