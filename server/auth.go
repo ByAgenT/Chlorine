@@ -3,8 +3,6 @@ package server
 import (
 	"chlorine/apierror"
 	"chlorine/auth"
-	"chlorine/cl"
-	"chlorine/storage"
 	"context"
 	"log"
 	"net/http"
@@ -39,36 +37,14 @@ type CompleteAuthHandler struct {
 func (h CompleteAuthHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	session := h.InitSession(r)
 
-	token, err := auth.ProcessReceivedToken(r, session)
+	err := auth.FinishAuthentication(context.Background(), r, session, h.storage)
 	if err != nil {
-		log.Printf("server: completeAuth: token process error: %s", err)
-		http.Error(w, "Authentication error", http.StatusForbidden)
-		return
+		log.Printf("unable to finish authorization: %s", err)
 	}
-
-	auth.WriteTokenToSession(session, token)
-
-	spotifyToken := &storage.SpotifyToken{
-		AccessToken:  token.AccessToken,
-		Expiry:       token.Expiry,
-		RefreshToken: token.RefreshToken,
-		TokenType:    token.TokenType}
-
-	roomConfig := &storage.RoomConfig{
-		SongsPerMember: 5,
-		MaxMembers:     10}
-
-	room, err := cl.CreateRoom(spotifyToken, roomConfig, h.storage)
-	if err != nil {
-		log.Printf("server: completeAuth: %s", err)
-	}
-
-	member, err := cl.CreateMember("Host", int(*room.ID), storage.RoleAdmin, h.storage)
-
-	session.Values["MemberID"] = member.ID
 	err = session.Save(r, w)
 	if err != nil {
-		log.Printf("server: completeAuth: error saving session: %s", err)
+		log.Printf("unable to save session: %s", err)
+		return
 	}
 
 	http.Redirect(w, r, "/player", http.StatusFound)
