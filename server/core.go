@@ -1,11 +1,13 @@
 package server
 
 import (
+	"chlorine/apierror"
 	"chlorine/auth"
 	"chlorine/middleware"
 	"chlorine/music"
 	"chlorine/storage"
 	"encoding/gob"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -69,6 +71,13 @@ func InitSpotifyClientFromSession(s *sessions.Session) (*spotify.Client, error) 
 	}
 	client := authenticator.NewClient(token)
 	return &client, nil
+}
+
+func panicIfErr(jsonWriter JSONResponseWriter, err error, pretext string) {
+	if err != nil {
+		jsonWriter.Error(apierror.APIServerError, http.StatusInternalServerError)
+		panic(fmt.Sprintf("%s: %s", pretext, err.Error()))
+	}
 }
 
 func injectMiddlewares(h http.Handler) http.Handler {

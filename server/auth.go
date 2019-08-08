@@ -20,11 +20,7 @@ func (h LoginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	authURL := auth.InitializeLogin(context.Background(), session)
 	err := session.Save(r, w)
-	if err != nil {
-		log.Printf("unable to save session: %s", err)
-		jsonWriter.Error(apierror.APIServerError, http.StatusInternalServerError)
-		return
-	}
+	panicIfErr(jsonWriter, err, "unable to save session")
 	http.Redirect(w, r, authURL, http.StatusFound)
 }
 
@@ -42,10 +38,7 @@ func (h CompleteAuthHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		log.Printf("unable to finish authorization: %s", err)
 	}
 	err = session.Save(r, w)
-	if err != nil {
-		log.Printf("unable to save session: %s", err)
-		return
-	}
+	panicIfErr(JSONResponseWriter{w}, err, "server: complete auth: cannot save session")
 
 	http.Redirect(w, r, "/player", http.StatusFound)
 }
@@ -67,9 +60,7 @@ func (h SpotifyTokenHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err = session.Save(r, w)
-	if err != nil {
-		log.Printf("server: spotifyToken: cannot save session: %s", err)
-	}
+	panicIfErr(jsonWriter, err, "server: spotifyToken: cannot save session")
 
 	jsonWriter.WriteJSONObject(token)
 }
