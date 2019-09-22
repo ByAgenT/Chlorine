@@ -55,6 +55,7 @@ func (h ExternalMusicHandler) GetClient(session *sessions.Session) (music.Client
 // StartChlorineServer starts Chlorine to listen to HTTP connections on the given port.
 func StartChlorineServer(port string) {
 	dbStorage = storage.ConnectDatabase(dbConfig)
+	initHandlers()
 	handler := GetApplicationHandler()
 	err := http.ListenAndServe(port, handler)
 	if err != nil {

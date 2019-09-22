@@ -22,7 +22,7 @@ func (s SpotifySessionAuthentication) GetAuth(session *sessions.Session) (auth.A
 	return SpotifyAuthenticator{Token: token}, nil
 }
 
-// SpotifyAuthenticator is an implemetation of an authenticator for the Spotify.
+// SpotifyAuthenticator is an implementation of an authenticator for the Spotify.
 type SpotifyAuthenticator struct {
 	Token *oauth2.Token
 }

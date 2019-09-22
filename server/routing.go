@@ -7,7 +7,6 @@ import (
 // GetApplicationHandler create dispatcher handler with all application routes.
 func GetApplicationHandler() *http.ServeMux {
 	handler := http.NewServeMux()
-	storageHandler.storage = dbStorage
 
 	// Connect routesets to the main handler.
 	authRouting(handler)

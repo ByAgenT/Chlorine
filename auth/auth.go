@@ -5,6 +5,7 @@ import (
 	"chlorine/storage"
 	"context"
 	"crypto/md5"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"log"
@@ -82,7 +83,7 @@ func GetTokenCode(state string, r *http.Request) (string, error) {
 func CreateRandomState(session *sessions.Session) string {
 	preState := []byte(session.ID + secretKey)
 	state := md5.Sum(preState)
-	return string(state[:md5.Size])
+	return hex.EncodeToString(state[:md5.Size])
 }
 
 // GetTokenFromSession pull authorization inforamtion from user session and return OAuth2 token.

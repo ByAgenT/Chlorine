@@ -62,5 +62,6 @@ func (h SpotifyTokenHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	err = session.Save(r, w)
 	panicIfErr(jsonWriter, err, "server: spotifyToken: cannot save session")
 
-	jsonWriter.WriteJSONObject(token)
+	// TODO: do err handling.
+	_ = jsonWriter.WriteJSONObject(token)
 }
