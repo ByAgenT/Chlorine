@@ -3,7 +3,6 @@ package server
 import (
 	"chlorine/apierror"
 	"chlorine/auth"
-	"chlorine/middleware"
 	"chlorine/music"
 	"chlorine/storage"
 	"chlorine/ws"
@@ -15,7 +14,6 @@ import (
 	"time"
 
 	"github.com/gorilla/sessions"
-	"github.com/zmb3/spotify"
 )
 
 var (
@@ -66,26 +64,11 @@ func StartChlorineServer(port string) {
 	}
 }
 
-// InitSpotifyClientFromSession doing client initialization from session storage.
-func InitSpotifyClientFromSession(s *sessions.Session) (*spotify.Client, error) {
-	authenticator := auth.GetSpotifyAuthenticator()
-	token, err := auth.GetTokenFromSession(s)
-	if err != nil {
-		return nil, err
-	}
-	client := authenticator.NewClient(token)
-	return &client, nil
-}
-
 func panicIfErr(jsonWriter JSONResponseWriter, err error, pretext string) {
 	if err != nil {
 		jsonWriter.Error(apierror.APIServerError, http.StatusInternalServerError)
 		panic(fmt.Sprintf("%s: %s", pretext, err.Error()))
 	}
-}
-
-func injectMiddlewares(h http.Handler) http.Handler {
-	return middleware.ApplyMiddlewares(h, LogMiddleware)
 }
 
 func init() {
