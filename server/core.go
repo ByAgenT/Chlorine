@@ -6,6 +6,7 @@ import (
 	"chlorine/middleware"
 	"chlorine/music"
 	"chlorine/storage"
+	"chlorine/ws"
 	"encoding/gob"
 	"fmt"
 	"log"
@@ -25,6 +26,7 @@ var (
 		User:     os.Getenv("POSTGRES_USER"),
 		Password: os.Getenv("POSTGRES_PASSWORD"),
 		Name:     os.Getenv("POSTGRES_DATABASE")}
+	webSocketHub = ws.CreateHub()
 )
 
 // ExternalMusicHandler contains external MusicService and authentication provider for it to retrieve music information.
@@ -55,6 +57,7 @@ func (h ExternalMusicHandler) GetClient(session *sessions.Session) (music.Client
 // StartChlorineServer starts Chlorine to listen to HTTP connections on the given port.
 func StartChlorineServer(port string) {
 	dbStorage = storage.ConnectDatabase(dbConfig)
+	go webSocketHub.Run()
 	initHandlers()
 	handler := GetApplicationHandler()
 	err := http.ListenAndServe(port, handler)

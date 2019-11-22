@@ -26,7 +26,7 @@ const (
 
 var (
 	scopes = []string{"streaming",
-		spotify.ScopeUserReadBirthdate,
+		spotify.ScopeUserLibraryModify,
 		spotify.ScopeUserReadEmail,
 		spotify.ScopeUserReadPrivate,
 		spotify.ScopePlaylistReadPrivate,

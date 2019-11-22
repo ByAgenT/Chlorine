@@ -23,7 +23,7 @@ var (
 	roomHandler               RoomHandler
 	memberHandler             MemberHandler
 	roomMembersHandler        RoomMembersHandler
-	roomSongsHanlder          RoomSongsHandler
+	roomSongsHandler          RoomSongsHandler
 	roomSongsSpotifiedHandler RoomsSongsSpotifiedHandler
 )
 
@@ -47,6 +47,6 @@ func initHandlers() {
 	roomHandler = RoomHandler{StorageHandler: storageHandler}
 	memberHandler = MemberHandler{StorageHandler: storageHandler}
 	roomMembersHandler = RoomMembersHandler{StorageHandler: storageHandler}
-	roomSongsHanlder = RoomSongsHandler{StorageHandler: storageHandler, ExternalMusicHandler: externalMusicHandler}
+	roomSongsHandler = RoomSongsHandler{StorageHandler: storageHandler, ExternalMusicHandler: externalMusicHandler}
 	roomSongsSpotifiedHandler = RoomsSongsSpotifiedHandler{StorageHandler: storageHandler, ExternalMusicHandler: externalMusicHandler}
 }

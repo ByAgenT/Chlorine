@@ -8,10 +8,11 @@ import (
 func GetApplicationHandler() *http.ServeMux {
 	handler := http.NewServeMux()
 
-	// Connect routesets to the main handler.
+	// Connect route sets to the main handler.
 	authRouting(handler)
 	spotifyRouting(handler)
 	chlorineRouting(handler)
+	wsRouting(handler)
 
 	return handler
 }
@@ -33,7 +34,11 @@ func spotifyRouting(handler *http.ServeMux) {
 func chlorineRouting(handler *http.ServeMux) {
 	handler.Handle("/room", injectMiddlewares(roomHandler))
 	handler.Handle("/room/members", injectMiddlewares(roomMembersHandler))
-	handler.Handle("/room/songs", injectMiddlewares(roomSongsHanlder))
+	handler.Handle("/room/songs", injectMiddlewares(roomSongsHandler))
 	handler.Handle("/room/songs/spotify", injectMiddlewares(roomSongsSpotifiedHandler))
 	handler.Handle("/member", injectMiddlewares(memberHandler))
+}
+
+func wsRouting(handler *http.ServeMux) {
+	handler.HandleFunc("/ws", WebSocketHandler)
 }
