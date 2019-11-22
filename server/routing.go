@@ -1,44 +1,50 @@
 package server
 
 import (
-	"net/http"
+	"github.com/gorilla/mux"
 )
 
-// GetApplicationHandler create dispatcher handler with all application routes.
-func GetApplicationHandler() *http.ServeMux {
-	handler := http.NewServeMux()
+// GetApplicationHandler create dispatcher router with all application routes.
+func GetApplicationHandler() *mux.Router {
+	router := mux.NewRouter()
 
-	// Connect route sets to the main handler.
-	authRouting(handler)
-	spotifyRouting(handler)
-	chlorineRouting(handler)
-	wsRouting(handler)
+	setupMiddlewares(router)
 
-	return handler
+	// Connect route sets to the main router.
+	authRouting(router)
+	spotifyRouting(router)
+	chlorineRouting(router)
+	wsRouting(router)
+
+	return router
 }
 
-func authRouting(handler *http.ServeMux) {
-	handler.Handle("/login", injectMiddlewares(loginHandler))
-	handler.Handle("/authcomplete", injectMiddlewares(completeAuthHandler))
-	handler.Handle("/token", injectMiddlewares(spotifyTokenHandler))
+func setupMiddlewares(router *mux.Router) {
+	router.Use(LogMiddleware)
 }
 
-func spotifyRouting(handler *http.ServeMux) {
-	handler.Handle("/me/playlists", injectMiddlewares(playlistsHandler))
-	handler.Handle("/me/player/devices", injectMiddlewares(availableDevicesHandler))
-	handler.Handle("/me/player/", injectMiddlewares(playbackHandler))
-	handler.Handle("/play", injectMiddlewares(spotifyPlayHandler))
-	handler.Handle("/search", injectMiddlewares(searchSongHandler))
+func authRouting(router *mux.Router) {
+	router.Handle("/login", loginHandler).Methods("GET")
+	router.Handle("/authcomplete", completeAuthHandler).Methods("GET")
+	router.Handle("/token", spotifyTokenHandler).Methods("GET")
 }
 
-func chlorineRouting(handler *http.ServeMux) {
-	handler.Handle("/room", injectMiddlewares(roomHandler))
-	handler.Handle("/room/members", injectMiddlewares(roomMembersHandler))
-	handler.Handle("/room/songs", injectMiddlewares(roomSongsHandler))
-	handler.Handle("/room/songs/spotify", injectMiddlewares(roomSongsSpotifiedHandler))
-	handler.Handle("/member", injectMiddlewares(memberHandler))
+func spotifyRouting(router *mux.Router) {
+	router.Handle("/me/playlists", playlistsHandler).Methods("GET")
+	router.Handle("/me/player/devices", availableDevicesHandler).Methods("GET")
+	router.Handle("/me/player/", playbackHandler).Methods("GET", "PUT")
+	router.Handle("/play", spotifyPlayHandler).Methods("POST")
+	router.Handle("/search", searchSongHandler).Methods("GET")
 }
 
-func wsRouting(handler *http.ServeMux) {
-	handler.HandleFunc("/ws", WebSocketHandler)
+func chlorineRouting(router *mux.Router) {
+	router.Handle("/room", roomHandler).Methods("GET")
+	router.Handle("/room/members", roomMembersHandler).Methods("GET")
+	router.Handle("/room/songs", roomSongsHandler).Methods("GET", "POST")
+	router.Handle("/room/songs/spotify", roomSongsSpotifiedHandler).Methods("GET")
+	router.Handle("/member", memberHandler).Methods("GET", "POST")
+}
+
+func wsRouting(router *mux.Router) {
+	router.HandleFunc("/ws", WebSocketHandler)
 }

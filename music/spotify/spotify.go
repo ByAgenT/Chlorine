@@ -1,7 +1,8 @@
-package music
+package spotify
 
 import (
 	"chlorine/auth"
+	"chlorine/music"
 	"fmt"
 
 	"github.com/gorilla/sessions"
@@ -31,7 +32,7 @@ type SpotifyAuthenticator struct {
 type SpotifyService struct{}
 
 // Authenticate provides authenticator for the Spotify and return Client for Spotify.
-func (s SpotifyService) Authenticate(authenticator auth.Authenticator) (Client, error) {
+func (s SpotifyService) Authenticate(authenticator auth.Authenticator) (music.Client, error) {
 	spotifyAuth := auth.GetSpotifyAuthenticator()
 	oauthAuthenticator, ok := authenticator.(SpotifyAuthenticator)
 	if !ok {
