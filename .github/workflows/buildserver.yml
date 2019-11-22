@@ -1,9 +1,6 @@
 name: Build Server Container
 
 on:
-  push:
-    branches:
-      - master
   pull_request:
     branches: 
       - master
