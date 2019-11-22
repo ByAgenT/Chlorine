@@ -13,7 +13,7 @@ import (
 	"github.com/zmb3/spotify"
 )
 
-// RoomHandler handle room creation and retrieving inforamtion about rooms.
+// RoomHandler handle room creation and retrieving information about rooms.
 type RoomHandler struct {
 	auth.Session
 	StorageHandler
@@ -86,11 +86,12 @@ func (h RoomMembersHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// RoomSongsHandler handle serving songs that are assinged to the current room.
+// RoomSongsHandler handle serving songs that are assigned to the current room.
 type RoomSongsHandler struct {
 	auth.Session
 	StorageHandler
 	ExternalMusicHandler
+	SongService cl.SongService
 }
 
 func (h RoomSongsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -109,13 +110,12 @@ func (h RoomSongsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			log.Printf("server: RoomSongsHandler: cannot retrieve member: %s", err)
 			return
 		}
-		room, err := h.storage.GetRoom(storage.ID(member.RoomID))
+		songs, err := h.SongService.GetRoomSongs(int(member.RoomID))
 		if err != nil {
-			log.Printf("server: RoomSongsHandler: %s", err.Error())
+			log.Printf("server: RoomSongsHandler: %s", err)
 			jsonWriter.Error(apierror.APIServerError, 500)
 			return
 		}
-		songs, err := h.storage.GetRoomSongs(room)
 		jsonWriter.WriteJSONObject(songs)
 		return
 	case "POST":
@@ -149,7 +149,13 @@ func (h RoomSongsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			jsonWriter.Error(apierror.APIInvalidRequest, http.StatusBadRequest)
 			return
 		}
-		song, err := cl.CreateSong(songData.SpotifyID, int(*room.ID), songData.PreviousSongID, songData.NextSongID, member, h.storage)
+		song, err := h.SongService.CreateSong(cl.RawSong{
+			SpotifyID:      songData.SpotifyID,
+			RoomID:         int(*room.ID),
+			PreviousSongID: songData.PreviousSongID,
+			NextSongID:     songData.NextSongID,
+			MemberCreated:  member,
+		})
 		if err != nil {
 			log.Printf("server: RoomSongsHandler: cannot create song: %s", err)
 			jsonWriter.Error(apierror.APIServerError, http.StatusInternalServerError)
@@ -189,7 +195,13 @@ func (h RoomSongsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			jsonWriter.Error(apierror.APIInvalidRequest, http.StatusBadRequest)
 			return
 		}
-		song, err := cl.UpdateSong(songData.ID, songData.SpotifyID, int(*room.ID), songData.PreviousSongID, songData.NextSongID, member, h.storage)
+		song, err := h.SongService.UpdateSong(songData.ID, cl.RawSong{
+			SpotifyID:      songData.SpotifyID,
+			RoomID:         int(*room.ID),
+			PreviousSongID: songData.PreviousSongID,
+			NextSongID:     songData.NextSongID,
+			MemberCreated:  member,
+		})
 		if err != nil {
 			log.Printf("server: RoomSongsHandler: cannot create song: %s", err)
 			jsonWriter.Error(apierror.APIServerError, http.StatusInternalServerError)

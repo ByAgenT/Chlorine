@@ -47,6 +47,6 @@ func initHandlers() {
 	roomHandler = RoomHandler{StorageHandler: storageHandler}
 	memberHandler = MemberHandler{StorageHandler: storageHandler}
 	roomMembersHandler = RoomMembersHandler{StorageHandler: storageHandler}
-	roomSongsHandler = RoomSongsHandler{StorageHandler: storageHandler, ExternalMusicHandler: externalMusicHandler}
+	roomSongsHandler = RoomSongsHandler{StorageHandler: storageHandler, ExternalMusicHandler: externalMusicHandler, SongService: songService}
 	roomSongsSpotifiedHandler = RoomsSongsSpotifiedHandler{StorageHandler: storageHandler, ExternalMusicHandler: externalMusicHandler}
 }

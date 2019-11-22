@@ -86,7 +86,7 @@ func CreateRandomState(session *sessions.Session) string {
 	return hex.EncodeToString(state[:md5.Size])
 }
 
-// GetTokenFromSession pull authorization inforamtion from user session and return OAuth2 token.
+// GetTokenFromSession pull authorization information from user session and return OAuth2 token.
 func GetTokenFromSession(session *sessions.Session) (*oauth2.Token, error) {
 
 	token := new(oauth2.Token)
@@ -158,10 +158,15 @@ func FinishAuthentication(ctx context.Context, r *http.Request, session *session
 
 	room, err := cl.CreateRoom(spotifyToken, roomConfig, db)
 	if err != nil {
-		log.Printf("server: completeAuth: %s", err)
+		log.Printf("authentication: %s", err)
+		return fmt.Errorf("authentication: %s", err)
 	}
 
 	member, err := cl.CreateMember("Host", int(*room.ID), storage.RoleAdmin, db)
+	if err != nil {
+		log.Printf("authentication: %s", err)
+		return fmt.Errorf("authentication: %s", err)
+	}
 	session.Values["MemberID"] = member.ID
 
 	return nil

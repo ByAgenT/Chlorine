@@ -1,13 +1,16 @@
 package server
 
 import (
+	"chlorine/cl"
 	"chlorine/music/spotify"
 )
 
 var (
 	// Music service binding
-	musicService = &spotify.SpotifyService{}
+	musicService = &spotify.Service{}
 
 	// Authentication provider binding
-	authenticationProvider = &spotify.SpotifySessionAuthentication{}
+	authenticationProvider = &spotify.SessionAuthentication{}
+
+	songService = cl.ChlorineSongService{Repository: songRepository}
 )
