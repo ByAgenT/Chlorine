@@ -1,0 +1,1 @@
+DEVELOPMENT_PROXY=http://localhost yarn start

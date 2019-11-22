@@ -1,10 +1,14 @@
 package server
 
 import (
+	"chlorine/apierror"
 	"chlorine/auth"
+	"chlorine/middleware"
 	"chlorine/music"
 	"chlorine/storage"
+	"chlorine/ws"
 	"encoding/gob"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -22,6 +26,7 @@ var (
 		User:     os.Getenv("POSTGRES_USER"),
 		Password: os.Getenv("POSTGRES_PASSWORD"),
 		Name:     os.Getenv("POSTGRES_DATABASE")}
+	webSocketHub = ws.CreateHub()
 )
 
 // ExternalMusicHandler contains external MusicService and authentication provider for it to retrieve music information.
@@ -52,6 +57,8 @@ func (h ExternalMusicHandler) GetClient(session *sessions.Session) (music.Client
 // StartChlorineServer starts Chlorine to listen to HTTP connections on the given port.
 func StartChlorineServer(port string) {
 	dbStorage = storage.ConnectDatabase(dbConfig)
+	go webSocketHub.Run()
+	initHandlers()
 	handler := GetApplicationHandler()
 	err := http.ListenAndServe(port, handler)
 	if err != nil {
@@ -68,6 +75,17 @@ func InitSpotifyClientFromSession(s *sessions.Session) (*spotify.Client, error) 
 	}
 	client := authenticator.NewClient(token)
 	return &client, nil
+}
+
+func panicIfErr(jsonWriter JSONResponseWriter, err error, pretext string) {
+	if err != nil {
+		jsonWriter.Error(apierror.APIServerError, http.StatusInternalServerError)
+		panic(fmt.Sprintf("%s: %s", pretext, err.Error()))
+	}
+}
+
+func injectMiddlewares(h http.Handler) http.Handler {
+	return middleware.ApplyMiddlewares(h, LogMiddleware)
 }
 
 func init() {

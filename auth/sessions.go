@@ -35,7 +35,7 @@ func (s *Session) GetSession() (*sessions.Session, error) {
 	return s.session, nil
 }
 
-// InitSession method initialize sesstion objects within the handler
+// InitSession method initialize session objects within the handler
 func (s *Session) InitSession(r *http.Request) *sessions.Session {
 	s.session = InitSession(r)
 	return s.session
