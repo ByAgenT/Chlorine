@@ -3,6 +3,7 @@ package server
 import (
 	"chlorine/apierror"
 	"chlorine/auth"
+	"chlorine/cl"
 	"context"
 	"log"
 	"net/http"
@@ -28,12 +29,13 @@ func (h LoginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 type CompleteAuthHandler struct {
 	auth.Session
 	StorageHandler
+	MemberService cl.MemberService
 }
 
 func (h CompleteAuthHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	session := h.InitSession(r)
 
-	err := auth.FinishAuthentication(context.Background(), r, session, h.storage)
+	err := auth.FinishAuthentication(context.Background(), r, session, h.MemberService, h.storage)
 	if err != nil {
 		log.Printf("unable to finish authorization: %s", err)
 	}
@@ -62,6 +64,5 @@ func (h SpotifyTokenHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	err = session.Save(r, w)
 	panicIfErr(jsonWriter, err, "server: spotifyToken: cannot save session")
 
-	// TODO: do err handling.
-	_ = jsonWriter.WriteJSONObject(token)
+	jsonWriter.WriteJSONObject(token)
 }

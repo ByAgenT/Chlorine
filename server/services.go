@@ -12,5 +12,6 @@ var (
 	// Authentication provider binding
 	authenticationProvider = &spotify.SessionAuthentication{}
 
-	songService = cl.ChlorineSongService{Repository: songRepository}
+	songService   = cl.ChlorineSongService{Repository: songRepository}
+	memberService = cl.ChlorineMemberService{Repository: memberRepository}
 )

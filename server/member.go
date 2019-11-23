@@ -15,6 +15,7 @@ import (
 type MemberHandler struct {
 	auth.Session
 	StorageHandler
+	MemberService cl.MemberService
 }
 
 func (h MemberHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -51,7 +52,11 @@ func (h MemberHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			jsonWriter.Error(apierror.APIInvalidRequest, http.StatusBadRequest)
 			return
 		}
-		member, err := cl.CreateMember(memberData.Name, memberData.RoomID, storage.RoleMember, h.storage)
+		member, err := h.MemberService.CreateMember(cl.RawMember{
+			Name:   memberData.Name,
+			RoomID: memberData.RoomID,
+			Role:   storage.RoleMember,
+		})
 		if err != nil {
 			log.Printf("server: MemberHandler: cannot create member: %s", err)
 			jsonWriter.Error(apierror.APIServerError, http.StatusInternalServerError)

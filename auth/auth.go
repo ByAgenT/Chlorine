@@ -138,7 +138,7 @@ func InitializeLogin(ctx context.Context, session *sessions.Session) string {
 }
 
 // FinishAuthentication completes OAuth flow and save token information
-func FinishAuthentication(ctx context.Context, r *http.Request, session *sessions.Session, db *storage.DBStorage) error {
+func FinishAuthentication(ctx context.Context, r *http.Request, session *sessions.Session, memberService cl.MemberService, db *storage.DBStorage) error {
 	token, err := ProcessReceivedToken(r, session)
 	if err != nil {
 		return fmt.Errorf("authentication: %s", err)
@@ -161,8 +161,11 @@ func FinishAuthentication(ctx context.Context, r *http.Request, session *session
 		log.Printf("authentication: %s", err)
 		return fmt.Errorf("authentication: %s", err)
 	}
-
-	member, err := cl.CreateMember("Host", int(*room.ID), storage.RoleAdmin, db)
+	member, err := memberService.CreateMember(cl.RawMember{
+		Name:   "Host",
+		RoomID: int(*room.ID),
+		Role:   storage.RoleAdmin,
+	})
 	if err != nil {
 		log.Printf("authentication: %s", err)
 		return fmt.Errorf("authentication: %s", err)
