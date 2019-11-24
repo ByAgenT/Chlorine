@@ -17,6 +17,7 @@ import (
 type RoomHandler struct {
 	auth.Session
 	StorageHandler
+	MemberService cl.MemberService
 }
 
 func (h RoomHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -25,12 +26,12 @@ func (h RoomHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case "GET":
-		memberID, ok := session.Values["MemberID"].(storage.ID)
+		memberID, ok := session.Values["MemberID"].(int)
 		if !ok {
 			jsonWriter.Error(apierror.APIErrorUnauthorized, http.StatusUnauthorized)
 			return
 		}
-		member, err := h.storage.GetMember(memberID)
+		member, err := h.MemberService.GetMember(memberID)
 		if err != nil {
 			log.Printf("server: MemberHandler: cannot retrieve member: %s", err)
 			return
@@ -51,6 +52,7 @@ func (h RoomHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 type RoomMembersHandler struct {
 	auth.Session
 	StorageHandler
+	MemberService cl.MemberService
 }
 
 func (h RoomMembersHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -59,12 +61,12 @@ func (h RoomMembersHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case "GET":
-		memberID, ok := session.Values["MemberID"].(storage.ID)
+		memberID, ok := session.Values["MemberID"].(int)
 		if !ok {
 			jsonWriter.Error(apierror.APIErrorUnauthorized, http.StatusUnauthorized)
 			return
 		}
-		member, err := h.storage.GetMember(memberID)
+		member, err := h.MemberService.GetMember(memberID)
 		if err != nil {
 			log.Printf("server: RoomMemberHandler: cannot retrieve member: %s", err)
 			return
@@ -91,7 +93,8 @@ type RoomSongsHandler struct {
 	auth.Session
 	StorageHandler
 	ExternalMusicHandler
-	SongService cl.SongService
+	SongService   cl.SongService
+	MemberService cl.MemberService
 }
 
 func (h RoomSongsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -100,12 +103,12 @@ func (h RoomSongsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case "GET":
-		memberID, ok := session.Values["MemberID"].(storage.ID)
+		memberID, ok := session.Values["MemberID"].(int)
 		if !ok {
 			jsonWriter.Error(apierror.APIErrorUnauthorized, http.StatusUnauthorized)
 			return
 		}
-		member, err := h.storage.GetMember(memberID)
+		member, err := h.MemberService.GetMember(memberID)
 		if err != nil {
 			log.Printf("server: RoomSongsHandler: cannot retrieve member: %s", err)
 			return
@@ -119,12 +122,12 @@ func (h RoomSongsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		jsonWriter.WriteJSONObject(songs)
 		return
 	case "POST":
-		memberID, ok := session.Values["MemberID"].(storage.ID)
+		memberID, ok := session.Values["MemberID"].(int)
 		if !ok {
 			jsonWriter.Error(apierror.APIErrorUnauthorized, http.StatusUnauthorized)
 			return
 		}
-		member, err := h.storage.GetMember(memberID)
+		member, err := h.MemberService.GetMember(memberID)
 		room, err := h.storage.GetRoom(storage.ID(member.RoomID))
 		if err != nil {
 			log.Printf("server: RoomSongsHandler: %s", err.Error())
@@ -164,12 +167,12 @@ func (h RoomSongsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		jsonWriter.WriteJSONObject(song)
 		return
 	case "PUT":
-		memberID, ok := session.Values["MemberID"].(storage.ID)
+		memberID, ok := session.Values["MemberID"].(int)
 		if !ok {
 			jsonWriter.Error(apierror.APIErrorUnauthorized, http.StatusUnauthorized)
 			return
 		}
-		member, err := h.storage.GetMember(memberID)
+		member, err := h.MemberService.GetMember(memberID)
 		room, err := h.storage.GetRoom(storage.ID(member.RoomID))
 		if err != nil {
 			log.Printf("server: RoomSongsHandler: %s", err.Error())
@@ -217,6 +220,7 @@ type RoomsSongsSpotifiedHandler struct {
 	auth.Session
 	StorageHandler
 	ExternalMusicHandler
+	MemberService cl.MemberService
 }
 
 func (h RoomsSongsSpotifiedHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -225,12 +229,12 @@ func (h RoomsSongsSpotifiedHandler) ServeHTTP(w http.ResponseWriter, r *http.Req
 
 	switch r.Method {
 	case "GET":
-		memberID, ok := session.Values["MemberID"].(storage.ID)
+		memberID, ok := session.Values["MemberID"].(int)
 		if !ok {
 			jsonWriter.Error(apierror.APIErrorUnauthorized, http.StatusUnauthorized)
 			return
 		}
-		member, err := h.storage.GetMember(memberID)
+		member, err := h.MemberService.GetMember(memberID)
 		if err != nil {
 			log.Printf("server: RoomSongsHandler: cannot retrieve member: %s", err)
 			return

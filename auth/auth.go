@@ -37,7 +37,7 @@ var (
 	secretKey = os.Getenv("SECRET_KEY")
 )
 
-// Authenticator is an object that contains information abour authentication to the music service.
+// Authenticator is an object that contains information about authentication to the music service.
 type Authenticator interface{}
 
 // GetSpotifyAuthenticator create new instance of Spotify Authenticator

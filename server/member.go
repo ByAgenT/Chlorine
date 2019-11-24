@@ -24,11 +24,11 @@ func (h MemberHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case "GET":
-		memberID, ok := session.Values["MemberID"].(storage.ID)
+		memberID, ok := session.Values["MemberID"].(int)
 		if !ok {
 			jsonWriter.Error(apierror.APIErrorUnauthorized, http.StatusUnauthorized)
 		}
-		member, err := h.storage.GetMember(memberID)
+		member, err := h.MemberService.GetMember(memberID)
 		if err != nil {
 			log.Printf("server: MemberHandler: cannot retrieve member: %s", err)
 		}
