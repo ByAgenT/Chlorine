@@ -138,7 +138,7 @@ func InitializeLogin(ctx context.Context, session *sessions.Session) string {
 }
 
 // FinishAuthentication completes OAuth flow and save token information
-func FinishAuthentication(ctx context.Context, r *http.Request, session *sessions.Session, memberService cl.MemberService, db *storage.DBStorage) error {
+func FinishAuthentication(ctx context.Context, r *http.Request, session *sessions.Session, memberService cl.MemberService, roomService cl.RoomService) error {
 	token, err := ProcessReceivedToken(r, session)
 	if err != nil {
 		return fmt.Errorf("authentication: %s", err)
@@ -146,7 +146,7 @@ func FinishAuthentication(ctx context.Context, r *http.Request, session *session
 
 	WriteTokenToSession(session, token)
 
-	spotifyToken := &storage.SpotifyToken{
+	spotifyToken := &storage.Token{
 		AccessToken:  token.AccessToken,
 		Expiry:       token.Expiry,
 		RefreshToken: token.RefreshToken,
@@ -156,7 +156,7 @@ func FinishAuthentication(ctx context.Context, r *http.Request, session *session
 		SongsPerMember: 5,
 		MaxMembers:     10}
 
-	room, err := cl.CreateRoom(spotifyToken, roomConfig, db)
+	room, err := roomService.CreateRoom(spotifyToken, roomConfig)
 	if err != nil {
 		log.Printf("authentication: %s", err)
 		return fmt.Errorf("authentication: %s", err)

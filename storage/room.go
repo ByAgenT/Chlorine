@@ -22,9 +22,19 @@ type RoomConfig struct {
 	CreatedDate    time.Time `json:"created_date,omitempty"`
 }
 
-// GetRooms fetches all room entries from a database and return slice of Room objects.
-func (s DBStorage) GetRooms() ([]Room, error) {
-	rows, err := s.Query("SELECT id, spotify_token, config_id, created_date FROM room")
+type RoomRepository interface {
+	GetRooms() ([]Room, error)
+	GetRoom(roomID ID) (*Room, error)
+	SaveRoom(room *Room) error
+	SaveRoomConfig(rc *RoomConfig) error
+}
+
+type PGRoomRepository struct {
+	Storage *DBStorage
+}
+
+func (r PGRoomRepository) GetRooms() ([]Room, error) {
+	rows, err := r.Storage.Query("SELECT id, spotify_token, config_id, created_date FROM room")
 	if err != nil {
 		return nil, err
 	}
@@ -44,7 +54,59 @@ func (s DBStorage) GetRooms() ([]Room, error) {
 	return rooms, nil
 }
 
+func (r PGRoomRepository) GetRoom(roomID ID) (*Room, error) {
+	room := &Room{}
+	err := r.Storage.QueryRow("SELECT id, spotify_token, config_id, created_date FROM room WHERE id = $1", roomID).Scan(
+		&room.ID, &room.SpotifyTokenID, &room.ConfigID, &room.CreatedDate)
+	room.storage = r.Storage
+	if err != nil {
+		return nil, err
+	}
+	return room, nil
+}
+
+func (r PGRoomRepository) SaveRoom(room *Room) error {
+	if room.ID == nil {
+		var id ID
+		room.CreatedDate = time.Now().UTC()
+		err := r.Storage.QueryRow(
+			"INSERT INTO room (config_id, spotify_token, created_date) VALUES ($1, $2, $3) RETURNING id",
+			room.ConfigID, room.SpotifyTokenID, room.CreatedDate).Scan(&id)
+		if err != nil {
+			return err
+		}
+		room.ID = &id
+		return nil
+	}
+	_, err := r.Storage.Exec("UPDATE room SET config_id=$2, spotify_token=$3 WHERE id = $1", room.ID, room.ConfigID, room.SpotifyTokenID)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r PGRoomRepository) SaveRoomConfig(rc *RoomConfig) error {
+	if rc.ID == nil {
+		var id ID
+		rc.CreatedDate = time.Now().UTC()
+		err := r.Storage.QueryRow(
+			"INSERT INTO room_config (songs_per_member, max_members, created_date) VALUES ($1, $2, $3) RETURNING id",
+			rc.SongsPerMember, rc.MaxMembers, rc.CreatedDate).Scan(&id)
+		if err != nil {
+			return err
+		}
+		rc.ID = &id
+		return nil
+	}
+	_, err := r.Storage.Exec("UPDATE room_config SET songs_per_member=$2, max_members=$3 WHERE id = $1", rc.ID, rc.SongsPerMember, rc.MaxMembers)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // GetRoom return specific room object by it's ID.
+// TODO: deprecate
 func (s DBStorage) GetRoom(roomID ID) (*Room, error) {
 	room := &Room{}
 	err := s.QueryRow("SELECT id, spotify_token, config_id, created_date FROM room WHERE id = $1", roomID).Scan(
@@ -58,6 +120,7 @@ func (s DBStorage) GetRoom(roomID ID) (*Room, error) {
 
 // SaveRoom performs inserting of a new entry into database if ID is not present
 // or performs update of an entry with the given ID in the Room object.
+// TODO: deprecate
 func (s DBStorage) SaveRoom(room *Room) error {
 	if room.ID == nil {
 		var id ID
@@ -80,6 +143,7 @@ func (s DBStorage) SaveRoom(room *Room) error {
 
 // SaveRoomConfig performs inserting of a new entry into database if ID is not present
 // or performs update of an entry with the given ID in the RoomConfig object.
+// TODO: deprecate
 func (s DBStorage) SaveRoomConfig(rc *RoomConfig) error {
 	if rc.ID == nil {
 		var id ID

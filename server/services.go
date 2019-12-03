@@ -14,4 +14,5 @@ var (
 
 	songService   = cl.ChlorineSongService{Repository: songRepository}
 	memberService = cl.ChlorineMemberService{Repository: memberRepository}
+	roomService   = cl.ChlorineRoomService{Repository: roomRepository}
 )

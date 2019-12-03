@@ -34,7 +34,7 @@ func initHandlers() {
 
 	// Authentication handlers init
 	loginHandler = LoginHandler{StorageHandler: storageHandler}
-	completeAuthHandler = CompleteAuthHandler{StorageHandler: storageHandler, MemberService: memberService}
+	completeAuthHandler = CompleteAuthHandler{StorageHandler: storageHandler, MemberService: memberService, RoomService: roomService}
 	spotifyTokenHandler = SpotifyTokenHandler{}
 
 	// Music handlers init
@@ -45,11 +45,11 @@ func initHandlers() {
 	spotifyPlayHandler = SpotifyPlayHandler{ExternalMusicHandler: externalMusicHandler}
 
 	// Chlorine API handlers init
-	roomHandler = RoomHandler{StorageHandler: storageHandler, MemberService: memberService}
+	roomHandler = RoomHandler{StorageHandler: storageHandler, MemberService: memberService, RoomService: roomService}
 	memberHandler = MemberHandler{StorageHandler: storageHandler, MemberService: memberService}
-	roomMembersHandler = RoomMembersHandler{StorageHandler: storageHandler, MemberService: memberService}
+	roomMembersHandler = RoomMembersHandler{StorageHandler: storageHandler, MemberService: memberService, RoomService: roomService}
 	roomSongsHandler = RoomSongsHandler{StorageHandler: storageHandler, ExternalMusicHandler: externalMusicHandler,
-		SongService: songService, MemberService: memberService}
+		SongService: songService, MemberService: memberService, RoomService: roomService}
 	roomSongsSpotifiedHandler = RoomsSongsSpotifiedHandler{StorageHandler: storageHandler,
-		ExternalMusicHandler: externalMusicHandler, MemberService: memberService}
+		ExternalMusicHandler: externalMusicHandler, MemberService: memberService, SongService: songService, RoomService: roomService}
 }

@@ -4,7 +4,6 @@ import (
 	"chlorine/apierror"
 	"chlorine/auth"
 	"chlorine/cl"
-	"chlorine/storage"
 	"encoding/json"
 	"io/ioutil"
 	"log"
@@ -17,6 +16,7 @@ import (
 type RoomHandler struct {
 	auth.Session
 	StorageHandler
+	RoomService   cl.RoomService
 	MemberService cl.MemberService
 }
 
@@ -36,7 +36,7 @@ func (h RoomHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			log.Printf("server: MemberHandler: cannot retrieve member: %s", err)
 			return
 		}
-		room, err := h.storage.GetRoom(storage.ID(member.RoomID))
+		room, err := h.RoomService.GetRoom(int(member.RoomID))
 		if err != nil {
 			log.Printf("server: RoomHandler: %s", err.Error())
 			jsonWriter.Error(apierror.APIServerError, 500)
@@ -53,6 +53,7 @@ type RoomMembersHandler struct {
 	auth.Session
 	StorageHandler
 	MemberService cl.MemberService
+	RoomService   cl.RoomService
 }
 
 func (h RoomMembersHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -71,7 +72,7 @@ func (h RoomMembersHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			log.Printf("server: RoomMemberHandler: cannot retrieve member: %s", err)
 			return
 		}
-		room, err := h.storage.GetRoom(storage.ID(member.RoomID))
+		room, err := h.RoomService.GetRoom(int(member.RoomID))
 		if err != nil {
 			log.Printf("server: RoomMemberHandler: %s", err.Error())
 			jsonWriter.Error(apierror.APIServerError, 500)
@@ -95,6 +96,7 @@ type RoomSongsHandler struct {
 	ExternalMusicHandler
 	SongService   cl.SongService
 	MemberService cl.MemberService
+	RoomService   cl.RoomService
 }
 
 func (h RoomSongsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -128,7 +130,7 @@ func (h RoomSongsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		member, err := h.MemberService.GetMember(memberID)
-		room, err := h.storage.GetRoom(storage.ID(member.RoomID))
+		room, err := h.RoomService.GetRoom(int(member.RoomID))
 		if err != nil {
 			log.Printf("server: RoomSongsHandler: %s", err.Error())
 			jsonWriter.Error(apierror.APIServerError, 500)
@@ -173,7 +175,7 @@ func (h RoomSongsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		member, err := h.MemberService.GetMember(memberID)
-		room, err := h.storage.GetRoom(storage.ID(member.RoomID))
+		room, err := h.RoomService.GetRoom(int(member.RoomID))
 		if err != nil {
 			log.Printf("server: RoomSongsHandler: %s", err.Error())
 			jsonWriter.Error(apierror.APIServerError, 500)
@@ -221,6 +223,8 @@ type RoomsSongsSpotifiedHandler struct {
 	StorageHandler
 	ExternalMusicHandler
 	MemberService cl.MemberService
+	RoomService   cl.RoomService
+	SongService   cl.SongService
 }
 
 func (h RoomsSongsSpotifiedHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -239,13 +243,13 @@ func (h RoomsSongsSpotifiedHandler) ServeHTTP(w http.ResponseWriter, r *http.Req
 			log.Printf("server: RoomSongsHandler: cannot retrieve member: %s", err)
 			return
 		}
-		room, err := h.storage.GetRoom(storage.ID(member.RoomID))
+		room, err := h.RoomService.GetRoom(int(member.RoomID))
 		if err != nil {
 			log.Printf("server: RoomSongsHandler: %s", err.Error())
 			jsonWriter.Error(apierror.APIServerError, 500)
 			return
 		}
-		songs, err := h.storage.GetRoomSongs(room)
+		songs, err := h.SongService.GetRoomSongs(int(*room.ID))
 		client, err := h.GetClient(session)
 		if err != nil {
 			jsonWriter.Error(apierror.APIErrorUnauthorized, http.StatusForbidden)

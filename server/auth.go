@@ -30,12 +30,13 @@ type CompleteAuthHandler struct {
 	auth.Session
 	StorageHandler
 	MemberService cl.MemberService
+	RoomService   cl.RoomService
 }
 
 func (h CompleteAuthHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	session := h.InitSession(r)
 
-	err := auth.FinishAuthentication(context.Background(), r, session, h.MemberService, h.storage)
+	err := auth.FinishAuthentication(context.Background(), r, session, h.MemberService, h.RoomService)
 	if err != nil {
 		log.Printf("unable to finish authorization: %s", err)
 	}
