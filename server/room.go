@@ -15,7 +15,6 @@ import (
 // RoomHandler handle room creation and retrieving information about rooms.
 type RoomHandler struct {
 	auth.Session
-	StorageHandler
 	RoomService   cl.RoomService
 	MemberService cl.MemberService
 }
@@ -51,7 +50,6 @@ func (h RoomHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 // RoomMembersHandler handle serving members of the current room
 type RoomMembersHandler struct {
 	auth.Session
-	StorageHandler
 	MemberService cl.MemberService
 	RoomService   cl.RoomService
 }
@@ -92,7 +90,6 @@ func (h RoomMembersHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 // RoomSongsHandler handle serving songs that are assigned to the current room.
 type RoomSongsHandler struct {
 	auth.Session
-	StorageHandler
 	ExternalMusicHandler
 	SongService   cl.SongService
 	MemberService cl.MemberService
@@ -220,7 +217,6 @@ func (h RoomSongsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 // RoomsSongsSpotifiedHandler is a struct that serves songs from Spotify.
 type RoomsSongsSpotifiedHandler struct {
 	auth.Session
-	StorageHandler
 	ExternalMusicHandler
 	MemberService cl.MemberService
 	RoomService   cl.RoomService
@@ -260,6 +256,10 @@ func (h RoomsSongsSpotifiedHandler) ServeHTTP(w http.ResponseWriter, r *http.Req
 			trackIDs = append(trackIDs, spotify.ID(song.SpotifyID))
 		}
 		tracks, err := client.GetTracks(trackIDs...)
+		if tracks == nil {
+			jsonWriter.WriteJSONObject([]spotify.FullTrack{})
+			return
+		}
 		jsonWriter.WriteJSONObject(tracks)
 		return
 	}

@@ -170,7 +170,7 @@ func FinishAuthentication(ctx context.Context, r *http.Request, session *session
 		log.Printf("authentication: %s", err)
 		return fmt.Errorf("authentication: %s", err)
 	}
-	session.Values["MemberID"] = member.ID
+	session.Values["MemberID"] = int(*member.ID)
 
 	return nil
 }

@@ -22,8 +22,8 @@ type Session struct {
 	session *sessions.Session
 }
 
-// SessionAuthenticaton is an interface for authenticating music service via session.
-type SessionAuthenticaton interface {
+// SessionAuthentication is an interface for authenticating music service via session.
+type SessionAuthentication interface {
 	GetAuth(*sessions.Session) (Authenticator, error)
 }
 
@@ -57,11 +57,4 @@ func InitSession(r *http.Request) *sessions.Session {
 		log.Fatalf("auth: session: %s", err.Error())
 	}
 	return session
-}
-
-// SessionMiddleware is a middleware for initializing session between server and client.
-func SessionMiddleware(h http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		h.ServeHTTP(w, r)
-	})
 }

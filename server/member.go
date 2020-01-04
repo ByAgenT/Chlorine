@@ -14,8 +14,8 @@ import (
 // MemberHandler serve endpoint for creating non-admin member for Chlorine.
 type MemberHandler struct {
 	auth.Session
-	StorageHandler
 	MemberService cl.MemberService
+	TokenService  cl.TokenService
 }
 
 func (h MemberHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -62,7 +62,7 @@ func (h MemberHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			jsonWriter.Error(apierror.APIServerError, http.StatusInternalServerError)
 			return
 		}
-		token, err := h.storage.GetRoomToken(storage.ID(memberData.RoomID))
+		token, err := h.TokenService.GetRoomToken(memberData.RoomID)
 		if err != nil {
 			log.Printf("server: MemberHandler: cannot retrieve token: %s", err)
 			jsonWriter.Error(apierror.APIServerError, http.StatusInternalServerError)

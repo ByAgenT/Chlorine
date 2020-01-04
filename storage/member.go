@@ -30,7 +30,7 @@ type MemberRole struct {
 type MemberRepository interface {
 	SaveMember(member *Member) error
 	GetMember(memberID ID) (*Member, error)
-	GetMemberRole(member Member) (*MemberRole, error)
+	GetMemberRole(member *Member) (*MemberRole, error)
 }
 
 type PGMemberRepository struct {
@@ -38,7 +38,7 @@ type PGMemberRepository struct {
 }
 
 // GetMemberRole returns member role.
-func (m PGMemberRepository) GetMemberRole(member Member) (*MemberRole, error) {
+func (m PGMemberRepository) GetMemberRole(member *Member) (*MemberRole, error) {
 	role := &MemberRole{}
 	err := m.Storage.QueryRow("SELECT id, role_name, is_admin FROM member_role WHERE id = $1", member.Role).Scan(
 		&role.ID, &role.Name, &role.IsAdmin)

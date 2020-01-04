@@ -4,9 +4,6 @@ var (
 	// Music handler
 	externalMusicHandler ExternalMusicHandler
 
-	// Storage handler
-	storageHandler StorageHandler
-
 	// Authentication handlers
 	loginHandler        LoginHandler
 	completeAuthHandler CompleteAuthHandler
@@ -30,11 +27,10 @@ var (
 func initHandlers() {
 	externalMusicHandler = ExternalMusicHandler{MusicService: musicService,
 		AuthenticationProvider: authenticationProvider}
-	storageHandler = StorageHandler{storage: dbStorage}
 
 	// Authentication handlers init
-	loginHandler = LoginHandler{StorageHandler: storageHandler}
-	completeAuthHandler = CompleteAuthHandler{StorageHandler: storageHandler, MemberService: memberService, RoomService: roomService}
+	loginHandler = LoginHandler{}
+	completeAuthHandler = CompleteAuthHandler{MemberService: memberService, RoomService: roomService}
 	spotifyTokenHandler = SpotifyTokenHandler{}
 
 	// Music handlers init
@@ -45,11 +41,11 @@ func initHandlers() {
 	spotifyPlayHandler = SpotifyPlayHandler{ExternalMusicHandler: externalMusicHandler}
 
 	// Chlorine API handlers init
-	roomHandler = RoomHandler{StorageHandler: storageHandler, MemberService: memberService, RoomService: roomService}
-	memberHandler = MemberHandler{StorageHandler: storageHandler, MemberService: memberService}
-	roomMembersHandler = RoomMembersHandler{StorageHandler: storageHandler, MemberService: memberService, RoomService: roomService}
-	roomSongsHandler = RoomSongsHandler{StorageHandler: storageHandler, ExternalMusicHandler: externalMusicHandler,
+	roomHandler = RoomHandler{MemberService: memberService, RoomService: roomService}
+	memberHandler = MemberHandler{MemberService: memberService, TokenService: tokenService}
+	roomMembersHandler = RoomMembersHandler{MemberService: memberService, RoomService: roomService}
+	roomSongsHandler = RoomSongsHandler{ExternalMusicHandler: externalMusicHandler,
 		SongService: songService, MemberService: memberService, RoomService: roomService}
-	roomSongsSpotifiedHandler = RoomsSongsSpotifiedHandler{StorageHandler: storageHandler,
+	roomSongsSpotifiedHandler = RoomsSongsSpotifiedHandler{
 		ExternalMusicHandler: externalMusicHandler, MemberService: memberService, SongService: songService, RoomService: roomService}
 }
