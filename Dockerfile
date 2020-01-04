@@ -3,9 +3,6 @@ FROM golang AS build-env
 WORKDIR /go/src/chlorine/
 ADD . ./
 
-# Install project dependencies
-RUN go get -d
-
 # Compile application
 RUN CGO_ENABLED=0 go build -o app
 

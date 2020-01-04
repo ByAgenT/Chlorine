@@ -14,7 +14,8 @@ import (
 // MemberHandler serve endpoint for creating non-admin member for Chlorine.
 type MemberHandler struct {
 	auth.Session
-	StorageHandler
+	MemberService cl.MemberService
+	TokenService  cl.TokenService
 }
 
 func (h MemberHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -23,11 +24,11 @@ func (h MemberHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case "GET":
-		memberID, ok := session.Values["MemberID"].(storage.ID)
+		memberID, ok := session.Values["MemberID"].(int)
 		if !ok {
 			jsonWriter.Error(apierror.APIErrorUnauthorized, http.StatusUnauthorized)
 		}
-		member, err := h.storage.GetMember(memberID)
+		member, err := h.MemberService.GetMember(memberID)
 		if err != nil {
 			log.Printf("server: MemberHandler: cannot retrieve member: %s", err)
 		}
@@ -51,13 +52,17 @@ func (h MemberHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			jsonWriter.Error(apierror.APIInvalidRequest, http.StatusBadRequest)
 			return
 		}
-		member, err := cl.CreateMember(memberData.Name, memberData.RoomID, storage.RoleMember, h.storage)
+		member, err := h.MemberService.CreateMember(cl.RawMember{
+			Name:   memberData.Name,
+			RoomID: memberData.RoomID,
+			Role:   storage.RoleMember,
+		})
 		if err != nil {
 			log.Printf("server: MemberHandler: cannot create member: %s", err)
 			jsonWriter.Error(apierror.APIServerError, http.StatusInternalServerError)
 			return
 		}
-		token, err := h.storage.GetRoomToken(storage.ID(memberData.RoomID))
+		token, err := h.TokenService.GetRoomToken(memberData.RoomID)
 		if err != nil {
 			log.Printf("server: MemberHandler: cannot retrieve token: %s", err)
 			jsonWriter.Error(apierror.APIServerError, http.StatusInternalServerError)

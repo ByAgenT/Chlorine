@@ -18,12 +18,12 @@ const (
 func main() {
 	host, ok := os.LookupEnv("HOSTNAME")
 	if !ok {
-		log.Println("server: hostname not defined, using default.")
+		log.Printf("server: hostname not defined, using default (%s).", ServerHost)
 		host = ServerHost
 	}
 	port, ok := os.LookupEnv("PORT")
 	if !ok {
-		log.Println("server: port not defined, using default.")
+		log.Printf("server: port not defined, using default (%s).", ServerPort)
 		port = ServerPort
 	}
 	serveString := fmt.Sprintf("%s:%s", host, port)

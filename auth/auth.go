@@ -37,7 +37,7 @@ var (
 	secretKey = os.Getenv("SECRET_KEY")
 )
 
-// Authenticator is an object that contains information abour authentication to the music service.
+// Authenticator is an object that contains information about authentication to the music service.
 type Authenticator interface{}
 
 // GetSpotifyAuthenticator create new instance of Spotify Authenticator
@@ -86,7 +86,7 @@ func CreateRandomState(session *sessions.Session) string {
 	return hex.EncodeToString(state[:md5.Size])
 }
 
-// GetTokenFromSession pull authorization inforamtion from user session and return OAuth2 token.
+// GetTokenFromSession pull authorization information from user session and return OAuth2 token.
 func GetTokenFromSession(session *sessions.Session) (*oauth2.Token, error) {
 
 	token := new(oauth2.Token)
@@ -138,7 +138,7 @@ func InitializeLogin(ctx context.Context, session *sessions.Session) string {
 }
 
 // FinishAuthentication completes OAuth flow and save token information
-func FinishAuthentication(ctx context.Context, r *http.Request, session *sessions.Session, db *storage.DBStorage) error {
+func FinishAuthentication(ctx context.Context, r *http.Request, session *sessions.Session, memberService cl.MemberService, roomService cl.RoomService) error {
 	token, err := ProcessReceivedToken(r, session)
 	if err != nil {
 		return fmt.Errorf("authentication: %s", err)
@@ -146,7 +146,7 @@ func FinishAuthentication(ctx context.Context, r *http.Request, session *session
 
 	WriteTokenToSession(session, token)
 
-	spotifyToken := &storage.SpotifyToken{
+	spotifyToken := &storage.Token{
 		AccessToken:  token.AccessToken,
 		Expiry:       token.Expiry,
 		RefreshToken: token.RefreshToken,
@@ -156,13 +156,21 @@ func FinishAuthentication(ctx context.Context, r *http.Request, session *session
 		SongsPerMember: 5,
 		MaxMembers:     10}
 
-	room, err := cl.CreateRoom(spotifyToken, roomConfig, db)
+	room, err := roomService.CreateRoom(spotifyToken, roomConfig)
 	if err != nil {
-		log.Printf("server: completeAuth: %s", err)
+		log.Printf("authentication: %s", err)
+		return fmt.Errorf("authentication: %s", err)
 	}
-
-	member, err := cl.CreateMember("Host", int(*room.ID), storage.RoleAdmin, db)
-	session.Values["MemberID"] = member.ID
+	member, err := memberService.CreateMember(cl.RawMember{
+		Name:   "Host",
+		RoomID: int(*room.ID),
+		Role:   storage.RoleAdmin,
+	})
+	if err != nil {
+		log.Printf("authentication: %s", err)
+		return fmt.Errorf("authentication: %s", err)
+	}
+	session.Values["MemberID"] = int(*member.ID)
 
 	return nil
 }
