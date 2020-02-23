@@ -1,0 +1,6 @@
+node_modules/
+
+# Yarn related files
+yarn-error.log
+
+dist/
