@@ -1,6 +1,6 @@
 import * as React from 'react';
 import styled from 'styled-components';
-import ListItem from './ListItem';
+import ListItem from './common/ListItem';
 
 interface TrackListItemProps {
   img: string;

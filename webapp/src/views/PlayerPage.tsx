@@ -3,7 +3,7 @@ import RootPartyContainer from '../containers/RootPartyContainer';
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 import PartyContainer from '../containers/PartyContainer';
-import Panel from '../components/Panel';
+import Panel from '../components/common/Panel';
 import { usePlaybackInformation, useSpotifyPlayer, useSpotifyPlaylist } from '../hooks/player';
 import { useMembersList } from '../hooks/membership';
 import { useSongSearch } from '../hooks/search';
@@ -12,8 +12,8 @@ import debounce from 'lodash/debounce';
 import MembersList from '../components/MembersList';
 import Player from '../components/Player';
 import SpotifyPlaylist from '../components/SpotifyPlaylist';
-import TextInput from '../components/TextInput';
-import Modal from '../components/Modal';
+import TextInput from '../components/common/TextInput';
+import Modal from '../components/common/Modal';
 import SongSearchResultList from '../components/SongSearchResultList';
 
 const PlayerPage: React.FC = () => {

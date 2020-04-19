@@ -1,8 +1,8 @@
 import * as React from 'react';
 import styled from 'styled-components';
-import LinkButton from './LinkButton';
+import LinkButton from './common/LinkButton';
 import TrackListItem from './TrackListItem';
-import List from './List';
+import List from './common/List';
 import { SpotifyTrack } from '../models/chlorine';
 
 function toTrackTime(milliseconds: number): string {

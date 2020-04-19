@@ -1,8 +1,8 @@
 import * as React from 'react';
 import styled from 'styled-components';
-import List from './List';
-import LinkButton from './LinkButton';
-import ListItem from './ListItem';
+import List from './common/List';
+import LinkButton from './common/LinkButton';
+import ListItem from './common/ListItem';
 import { Member } from '../models/chlorine';
 
 interface MembersListProps {

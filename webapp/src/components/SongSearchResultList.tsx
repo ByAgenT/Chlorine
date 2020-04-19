@@ -1,6 +1,6 @@
 import * as React from 'react';
 import styled from 'styled-components';
-import LinkButton from './LinkButton';
+import LinkButton from './common/LinkButton';
 import { SpotifyTrack } from '../models/chlorine';
 
 interface SongSearchResultListProps {

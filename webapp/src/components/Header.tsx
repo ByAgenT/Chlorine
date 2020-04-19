@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
 import styled from 'styled-components';
-import LinkButton from './LinkButton';
+import LinkButton from './common/LinkButton';
 import { Member } from '../models/chlorine';
 
 interface UserInfoProps {

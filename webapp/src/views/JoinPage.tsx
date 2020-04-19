@@ -2,9 +2,9 @@ import * as React from 'react';
 import { useState } from 'react';
 import JoinContainer from '../containers/JoinContainer';
 import styled from 'styled-components';
-import Panel from '../components/Panel';
-import TextInput from '../components/TextInput';
-import LinkButton from '../components/LinkButton';
+import Panel from '../components/common/Panel';
+import TextInput from '../components/common/TextInput';
+import LinkButton from '../components/common/LinkButton';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
 import { ChlorineService } from '../services/chlorineService';
 
