@@ -1,1 +1,6 @@
+.git/
+.github/
 webapp/
+node_modules/
+.env.template
+db.env.template

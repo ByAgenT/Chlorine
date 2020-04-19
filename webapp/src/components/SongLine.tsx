@@ -1,6 +1,7 @@
 import * as React from 'react';
 import styled from 'styled-components';
 
+// TODO: use date-fns to do formatting
 function toTrackTime(milliseconds) {
   let date = new Date(milliseconds);
   return `${date.getMinutes()}:${date.getSeconds()}`;

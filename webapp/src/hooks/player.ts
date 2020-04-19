@@ -132,6 +132,7 @@ function useSpotifyPlaylist() {
     }
   }, []);
 
+  // TODO: revisit and optimize
   async function appendSong(spotifyId: string): Promise<Song> {
     const chlorineService = new ChlorineService();
     await Promise.all([fetchPlaylist(), fetchSpotifyTrackInfo()]);
@@ -139,14 +140,11 @@ function useSpotifyPlaylist() {
     if (lastSong[0]) {
       try {
         const newSong = await chlorineService.addSong(spotifyId, lastSong[0].id, null);
-        console.log('perform updating');
-        const updateResponse = await chlorineService.updateSong(lastSong[0].id, {
+        await chlorineService.updateSong(lastSong[0].id, {
           spotifyId: lastSong[0].spotifyId,
           prevSongId: lastSong[0].previousSongId,
           nextSongId: newSong.id,
         });
-        console.log('Updated song: ');
-        console.log(updateResponse);
         await Promise.all([fetchPlaylist(), fetchSpotifyTrackInfo()]);
         return newSong;
       } catch (error) {
@@ -154,7 +152,6 @@ function useSpotifyPlaylist() {
         return;
       }
     }
-    console.log('add first element');
     const song = await chlorineService.addSong(spotifyId, null, null);
     await Promise.all([fetchPlaylist(), fetchSpotifyTrackInfo()]);
     return song;
@@ -164,7 +161,6 @@ function useSpotifyPlaylist() {
     try {
       await new ChlorineService().play(spotifyTrackInfo.map((track) => track.uri));
     } catch (error) {
-      console.error('error while playing');
       console.error(error);
     }
   }

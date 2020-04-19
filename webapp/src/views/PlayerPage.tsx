@@ -52,7 +52,6 @@ const PlayerPage: React.FC = () => {
           const devices = await chlorineService.getDevicesInformation();
           const chlorine = devices.filter((device) => device.name === 'Chlorine');
           if (chlorine[0] !== undefined) {
-            console.log(`transferring to ${chlorine[0].id}`);
             await chlorineService.transferPlayback(chlorine[0].id, true);
           }
         } catch (error) {
@@ -79,14 +78,14 @@ const PlayerPage: React.FC = () => {
       </PartyContainer>
       <PartyContainer direction='column'>
         <Panel name='Members'>
-          <MembersList members={members} onUpdate={updateMembers} />
+          <MembersList members={members} onUpdate={updateMembers}/>
         </Panel>
-        <Panel name='Player'>{<Player player={player} playback={playback} />}</Panel>
+        <Panel name='Player'>{<Player player={player} playback={playback}/>}</Panel>
       </PartyContainer>
       <Modal display={[isModalShowed, setModalShowed]}>
         <h1>Search Songs</h1>
-        <TextInput placeholder='Enter Track' onChange={onSearchModalChange} />
-        <SongSearchResultList onSongAdd={appendSong} songs={searchResult} />
+        <TextInput placeholder='Enter Track' onChange={onSearchModalChange}/>
+        <SongSearchResultList onSongAdd={appendSong} songs={searchResult}/>
       </Modal>
     </RootPartyContainer>
   );
