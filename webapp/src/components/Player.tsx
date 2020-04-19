@@ -1,51 +1,66 @@
 import * as React from 'react';
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import SongLine from './SongLine';
 import { BackControl, NextControl, PauseControl, PlayControl } from './PlayerControls';
-import { down, only, up } from 'styled-breakpoints';
+import { down, up } from 'styled-breakpoints';
 import { SpotifyPlayer } from '../services/spotifyPlaybackService';
 import { SimplePlaybackInformation } from '../hooks/player';
 
 interface PlayerProps {
-  player: SpotifyPlayer;
+  player: SpotifyPlayer | null;
   playback: SimplePlaybackInformation;
 }
 
-const Player: React.FC<PlayerProps> = ({ player, playback }) => (
-  <PlayerContainer>
-    <TrackCover src={playback.albumCoverURL} />
-    <ControlContainer>
-      <SongTitle>
-        <span>{playback.artistTitle}</span>
-        {' – '}
-        <span>{playback.songTitle}</span>
-      </SongTitle>
-      <SongLine duration={playback.duration} now={playback.now} />
-      <ButtonsContainer>
-        <BackControl
-          onClick={() => {
-            player.previousTrack();
-          }}
-        />
-        <PlayControl
-          onClick={() => {
-            player.resume();
-          }}
-        />
-        <PauseControl
-          onClick={() => {
-            player.pause();
-          }}
-        />
-        <NextControl
-          onClick={() => {
-            player.nextTrack();
-          }}
-        />
-      </ButtonsContainer>
-    </ControlContainer>
-  </PlayerContainer>
-);
+const Player: React.FC<PlayerProps> = ({ player, playback }) => {
+  const [playerPlayback, setPlayerPlayback] = useState<Spotify.PlaybackState | null>(null);
+  useEffect(() => {
+    (async function () {
+      if (player) {
+        const state = await player.getCurrentState();
+        setPlayerPlayback(state);
+      }
+    })();
+  });
+
+  const duration = playerPlayback ? playerPlayback.duration : playback.duration;
+  const now = playerPlayback ? playerPlayback.position : playback.now;
+  return (
+    <PlayerContainer>
+      <TrackCover src={playback.albumCoverURL} />
+      <ControlContainer>
+        <SongTitle>
+          <span>{playback.artistTitle}</span>
+          {' – '}
+          <span>{playback.songTitle}</span>
+        </SongTitle>
+        <SongLine duration={duration} now={now} />
+        <ButtonsContainer>
+          <BackControl
+            onClick={() => {
+              player.previousTrack();
+            }}
+          />
+          <PlayControl
+            onClick={() => {
+              player.resume();
+            }}
+          />
+          <PauseControl
+            onClick={() => {
+              player.pause();
+            }}
+          />
+          <NextControl
+            onClick={() => {
+              player.nextTrack();
+            }}
+          />
+        </ButtonsContainer>
+      </ControlContainer>
+    </PlayerContainer>
+  );
+};
 
 const ControlContainer = styled.div`
   display: flex;
@@ -87,6 +102,7 @@ const SongTitle = styled.div`
   font-weight: 600;
   margin-bottom: 1em;
   font-size: 1.6rem;
+  max-width: 15rem;
   ${down('tablet')} {
     font-size: 1rem;
   }

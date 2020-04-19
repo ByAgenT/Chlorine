@@ -39,18 +39,13 @@ interface SongLineFgProps {
   progress: number;
 }
 
-interface SongLineFgAttrsProps {
-  width: string;
-}
-
-const SongLineFg = styled.div.attrs<SongLineFgProps, SongLineFgAttrsProps>((props) => ({
-  width: props.progress ? `${props.progress}%` : '0',
+const SongLineFg = styled.div.attrs<SongLineFgProps>((props) => ({
+  style: { width: props.progress ? `${props.progress}%` : '0' },
 }))<SongLineFgProps>`
   position: inherit;
   background-color: white;
   height: 5px;
   border-radius: 0.3em;
-  width: ${(props) => props.width};
 `;
 
 export default SongLine;

@@ -167,7 +167,9 @@ class ChlorineResponseMapper {
     return {
       device: this.mapDevice(playbackInformationResponse.device),
       isPlaying: playbackInformationResponse.is_playing,
-      item: this.mapSpotifyTrack(playbackInformationResponse.Item),
+      item: playbackInformationResponse.Item
+        ? this.mapSpotifyTrack(playbackInformationResponse.Item)
+        : null,
       progressMs: playbackInformationResponse.progress_ms,
       repeatState: playbackInformationResponse.repeat_state,
       shuffleState: playbackInformationResponse.shuffle_state,

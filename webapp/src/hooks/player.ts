@@ -117,7 +117,6 @@ function useSpotifyPlaylist() {
   const fetchPlaylist = useCallback(async function () {
     try {
       const fetchedSongs = await new ChlorineService().retrieveRoomSongs();
-      console.log(fetchedSongs);
       setPlaylist(fetchedSongs);
     } catch (error) {
       console.error(error);

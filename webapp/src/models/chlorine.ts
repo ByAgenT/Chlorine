@@ -32,7 +32,7 @@ interface PlaybackInformation {
   timestamp: number;
   progressMs: number;
   isPlaying: boolean;
-  item: SpotifyTrack;
+  item: SpotifyTrack | null;
   device: Device;
   shuffleState: boolean;
   repeatState: string; // TODO make repeatState Enum.

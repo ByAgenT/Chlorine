@@ -6,7 +6,7 @@ class SpotifyPlayer {
     this.player = player;
   }
 
-  async getCurrentState(): Promise<Spotify.PlaybackState> {
+  async getCurrentState(): Promise<Spotify.PlaybackState | null> {
     if (this.player !== undefined) {
       return this.player.getCurrentState();
     }
