@@ -4,6 +4,7 @@ import (
 	"chlorine/apierror"
 	"chlorine/auth"
 	"chlorine/cl"
+	"chlorine/ws"
 	"encoding/json"
 	"io/ioutil"
 	"log"
@@ -164,6 +165,14 @@ func (h RoomSongsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		jsonWriter.WriteJSONObject(song)
+		ws.Broadcast(roomWSConnections[int(member.RoomID)], &ws.Response{
+			Type:        ws.TypeBroadcast,
+			Status:      ws.StatusOK,
+			Description: "SongAdded",
+			Body: map[string]interface{}{
+				"song": song,
+			},
+		})
 		return
 	case "PUT":
 		memberID, ok := session.Values["MemberID"].(int)

@@ -22,6 +22,9 @@ var (
 	roomMembersHandler        RoomMembersHandler
 	roomSongsHandler          RoomSongsHandler
 	roomSongsSpotifiedHandler RoomsSongsSpotifiedHandler
+
+	// WebSocket handlers
+	wsHandler WebSocketInitHandler
 )
 
 func initHandlers() {
@@ -48,4 +51,7 @@ func initHandlers() {
 		SongService: songService, MemberService: memberService, RoomService: roomService}
 	roomSongsSpotifiedHandler = RoomsSongsSpotifiedHandler{
 		ExternalMusicHandler: externalMusicHandler, MemberService: memberService, SongService: songService, RoomService: roomService}
+
+	// WebSocket handlers init
+	wsHandler = WebSocketInitHandler{MemberService: memberService}
 }

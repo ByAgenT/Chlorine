@@ -20,6 +20,15 @@ type Client struct {
 	receive chan []byte
 }
 
+func (c *Client) SendMessage(message []byte) {
+	c.send <- message
+}
+
+func (c *Client) Deregister() {
+	c.hub.unregister <- c
+	_ = c.conn.Close()
+}
+
 func (c *Client) serve() {
 	go c.serveRead()
 	go c.serveWrite()
@@ -42,10 +51,7 @@ func (c *Client) serveWrite() {
 
 // serveRead handles all incoming messages from websocket connection
 func (c *Client) serveRead() {
-	defer func() {
-		c.hub.unregister <- c
-		_ = c.conn.Close()
-	}()
+	defer c.Deregister()
 
 	for {
 		_, message, err := c.conn.ReadMessage()
@@ -71,5 +77,15 @@ func (c *Client) serveRead() {
 			break
 		}
 		c.receive <- message
+	}
+}
+
+func Broadcast(clients []*Client, message *Response) {
+	response, err := json.Marshal(message)
+	if err != nil {
+		log.Fatalf("Error encoding base error response: %s", err)
+	}
+	for _, client := range clients {
+		go client.SendMessage(response)
 	}
 }

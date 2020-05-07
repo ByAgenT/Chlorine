@@ -46,5 +46,5 @@ func chlorineRouting(router *mux.Router) {
 }
 
 func wsRouting(router *mux.Router) {
-	router.HandleFunc("/ws", WebSocketHandler)
+	router.Handle("/ws", wsHandler)
 }

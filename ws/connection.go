@@ -13,7 +13,7 @@ var (
 )
 
 // ServeWSConnection initiate websocket handshake and register new connection in websocket hub.
-func ServeWSConnection(hub *Hub, w http.ResponseWriter, r *http.Request) {
+func ServeWSConnection(hub *Hub, w http.ResponseWriter, r *http.Request) *Client {
 	connection, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		panic("Unhandled upgrade error.")
@@ -26,4 +26,5 @@ func ServeWSConnection(hub *Hub, w http.ResponseWriter, r *http.Request) {
 	}
 	hub.register <- client
 	go client.serve()
+	return client
 }

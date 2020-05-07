@@ -5,6 +5,7 @@ import (
 	"chlorine/auth"
 	"chlorine/cl"
 	"chlorine/storage"
+	"chlorine/ws"
 	"encoding/json"
 	"io/ioutil"
 	"log"
@@ -81,6 +82,14 @@ func (h MemberHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			log.Printf("server: MemberHandler: error saving session: %s", err)
 		}
 		jsonWriter.WriteHeader(http.StatusCreated)
+		ws.Broadcast(roomWSConnections[int(member.RoomID)], &ws.Response{
+			Type:        ws.TypeBroadcast,
+			Status:      ws.StatusOK,
+			Description: "MemberAdded",
+			Body: map[string]interface{}{
+				"member": member,
+			},
+		})
 		return
 	}
 	jsonWriter.WriteHeader(http.StatusMethodNotAllowed)
