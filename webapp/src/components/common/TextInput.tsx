@@ -6,6 +6,7 @@ interface TextInputProps {
   placeholder: string;
 }
 
+// TODO: fix types.
 const TextInput: React.FC<TextInputProps> = ({ onChange, placeholder }) => (
   <div>
     <TextInputInput onChange={onChange as any} type='text' placeholder={placeholder} />

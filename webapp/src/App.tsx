@@ -5,7 +5,7 @@ import AppStyle from './globalStyle';
 import Header from './components/Header';
 import PlayerPage from './views/PlayerPage';
 import { useMemberInformation } from './hooks/membership';
-import ViewerPage from "./views/ViewerPage";
+import ViewerPage from './views/ViewerPage';
 
 const App = () => {
   let [member, refreshMember] = useMemberInformation();
@@ -13,11 +13,11 @@ const App = () => {
   return (
     <Router>
       <div>
-        <Header member={member} refreshMember={refreshMember}/>
-        <Route path='/player' exact component={PlayerPage}/>
-        <Route path='/' exact component={JoinPage}/>
-        <Route path="/viewer" exact component={ViewerPage}/>
-        <AppStyle/>
+        <Header member={member} refreshMember={refreshMember} />
+        <Route path='/player' exact component={PlayerPage} />
+        <Route path='/' exact component={JoinPage} />
+        <Route path='/viewer' exact component={ViewerPage} />
+        <AppStyle />
       </div>
     </Router>
   );

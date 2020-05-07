@@ -13,9 +13,9 @@ import Modal from '../components/common/Modal';
 import TextInput from '../components/common/TextInput';
 import SongSearchResultList from '../components/SongSearchResultList';
 
-const PartyPage = () => {
+const PartyPage: React.FC = () => {
   const [members, updateMembers] = useMembersList();
-  const [isModalShowed, setModalShowed] = useState(false);
+  const [isModalShowed, setModalShowed] = useState<boolean>(false);
   const { searchResult, setSongQuery } = useSongSearch();
   const {
     spotifyTrackInfo,
@@ -24,16 +24,16 @@ const PartyPage = () => {
     fetchSpotifyTrackInfo,
   } = useSpotifyPlaylist();
 
-  const updateSongQuery = debounce((event) => {
+  const updateSongQuery = debounce((event: React.ChangeEvent<HTMLTextAreaElement>): void => {
     setSongQuery(event.target.value);
   }, 200);
 
-  function onSearchModalChange(event) {
+  function onSearchModalChange(event: React.ChangeEvent<HTMLTextAreaElement>): void {
     event.persist();
     updateSongQuery(event);
   }
 
-  function updatePlaylist() {
+  function updatePlaylist(): void {
     Promise.all([fetchPlaylist(), fetchSpotifyTrackInfo()]);
   }
 
@@ -50,13 +50,13 @@ const PartyPage = () => {
       </PartyContainer>
       <PartyContainer direction='column'>
         <Panel name='Members'>
-          <MembersList members={members} onUpdate={updateMembers} />
+          <MembersList members={members} onUpdate={updateMembers}/>
         </Panel>
       </PartyContainer>
       <Modal display={[isModalShowed, setModalShowed]}>
         <h1>Search Songs</h1>
-        <TextInput placeholder='Enter Track' onChange={onSearchModalChange} />
-        <SongSearchResultList onSongAdd={appendSong} songs={searchResult} />
+        <TextInput placeholder='Enter Track' onChange={onSearchModalChange}/>
+        <SongSearchResultList onSongAdd={appendSong} songs={searchResult}/>
       </Modal>
     </RootPartyContainer>
   );
