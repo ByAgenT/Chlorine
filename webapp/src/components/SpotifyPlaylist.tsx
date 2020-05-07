@@ -12,8 +12,8 @@ function toTrackTime(milliseconds: number): string {
 
 interface SpotifyPlaylistProps {
   onAddSongClick: (event: React.MouseEvent) => void;
-  onStartPlay: (event: React.MouseEvent) => void;
-  onShuffle: (event: React.MouseEvent) => void;
+  onStartPlay?: (event: React.MouseEvent) => void;
+  onShuffle?: (event: React.MouseEvent) => void;
   onUpdate: (event: React.MouseEvent) => void;
   playlist: SpotifyTrack[];
 }
@@ -45,8 +45,8 @@ const SpotifyPlaylist: React.FC<SpotifyPlaylistProps> = ({
     </PlaylistList>
     <PlaylistBottomBar>
       <LinkButton onClick={onAddSongClick}>Add Songs</LinkButton>
-      <LinkButton onClick={onShuffle}>Shuffle</LinkButton>
-      <LinkButton onClick={onStartPlay}>Start Play</LinkButton>
+      {onShuffle ? <LinkButton onClick={onShuffle}>Shuffle</LinkButton> : ''}
+      {onStartPlay ? <LinkButton onClick={onStartPlay}>Start Play</LinkButton> : ''}
       <LinkButton onClick={onUpdate}>Refresh</LinkButton>
     </PlaylistBottomBar>
   </SpotifyPlaylistContainer>
