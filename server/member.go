@@ -75,7 +75,7 @@ func (h MemberHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		auth.WriteTokenToSession(session, oauthToken)
-		session.Values["MemberID"] = member.ID
+		session.Values["MemberID"] = int(*member.ID)
 		err = session.Save(r, w)
 		if err != nil {
 			log.Printf("server: MemberHandler: error saving session: %s", err)

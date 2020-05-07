@@ -40,7 +40,7 @@ func spotifyRouting(router *mux.Router) {
 func chlorineRouting(router *mux.Router) {
 	router.Handle("/room", roomHandler).Methods("GET")
 	router.Handle("/room/members", roomMembersHandler).Methods("GET")
-	router.Handle("/room/songs", roomSongsHandler).Methods("GET", "POST")
+	router.Handle("/room/songs", roomSongsHandler).Methods("GET", "POST", "PUT")
 	router.Handle("/room/songs/spotify", roomSongsSpotifiedHandler).Methods("GET")
 	router.Handle("/member", memberHandler).Methods("GET", "POST")
 }

@@ -48,7 +48,12 @@ func (h SpotifyPlayHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		for _, uri := range bodyData.URIs {
 			playUris = append(playUris, spotify.URI(uri))
 		}
-		client.PlayOpt(&spotify.PlayOptions{URIs: playUris})
+		err = client.PlayOpt(&spotify.PlayOptions{URIs: playUris})
+		if err != nil {
+			log.Printf("server: SpotifyPlayHandler: error start playing: %s", err)
+			jsonWriter.Error(apierror.APIInvalidRequest, http.StatusBadRequest)
+			return
+		}
 		jsonWriter.WriteHeader(http.StatusOK)
 		return
 	}

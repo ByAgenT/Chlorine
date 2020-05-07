@@ -8,13 +8,13 @@ import (
 // Song is a struct representation of a Spotify song within Chlorine.
 type Song struct {
 	Model
-	ID             *ID        `json:"id,omitempty"`
-	SpotifyID      string     `json:"spotify_id,omitempty"`
-	RoomID         Reference  `json:"room_id,omitempty"`
-	PreviousSongID *Reference `json:"previous_song_id,omitempty"`
-	NextSongID     *Reference `json:"next_song_id,omitempty"`
-	MemberAddedID  Reference  `json:"member_added_id,omitempty"`
-	CreatedDate    time.Time  `json:"created_date,omitempty"`
+	ID             *ID        `json:"id"`
+	SpotifyID      string     `json:"spotify_id"`
+	RoomID         Reference  `json:"room_id"`
+	PreviousSongID *Reference `json:"previous_song_id"`
+	NextSongID     *Reference `json:"next_song_id"`
+	MemberAddedID  Reference  `json:"member_added_id"`
+	CreatedDate    time.Time  `json:"created_date"`
 }
 
 type SongRepository interface {

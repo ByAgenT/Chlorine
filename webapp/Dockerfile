@@ -1,10 +1,20 @@
-FROM node:11.12-alpine
+# Build web application
+FROM node:13.11 as build-stage
 
-WORKDIR /usr/src/app
-ADD . ./
+WORKDIR /webapp
 
-ENV PATH /usr/src/app/node_modules/.bin:$PATH
-
+COPY package*.json /webapp/
 RUN npm install
+COPY . /webapp/
+RUN npm run build
 
-CMD ["npm", "start"]
+# Use nginx to serve web application
+FROM nginx:1.17
+
+COPY --from=build-stage /webapp/dist/ /etc/nginx/html/
+COPY config/nginx.conf /etc/nginx/nginx.conf
+
+
+
+
+

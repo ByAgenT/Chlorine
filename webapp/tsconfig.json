@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "rootDir": "src/",
+    "outDir": "dist/",
+    "lib": [
+      "es7",
+      "dom",
+      "esnext"
+    ],
+    "jsx": "react",
+    "module": "commonjs",
+    "target": "es5",
+    "sourceMap": true,
+    "esModuleInterop": true
+  },
+  "exclude": [
+    "node_modules"
+  ]
+}
