@@ -1,6 +1,7 @@
 package ws
 
 import (
+	"encoding/json"
 	"github.com/gorilla/websocket"
 	"log"
 )
@@ -20,27 +21,30 @@ type Client struct {
 }
 
 func (c *Client) serve() {
-	defer func() {
-		c.hub.unregister <- c
-		_ = c.conn.Close()
-	}()
-
 	go c.serveRead()
 	go c.serveWrite()
 }
 
 func (c *Client) serveWrite() {
 	for {
-		message := <-c.send
-		w, err := c.conn.NextWriter(websocket.TextMessage)
-		if err != nil {
-			return
+		message, ok := <-c.send
+		if !ok {
+			log.Printf("Stopping write goroutine for client %s due to connection close", c.conn.RemoteAddr())
+			break
 		}
-		w.Write(message)
+		err := c.conn.WriteMessage(websocket.TextMessage, message)
+		if err != nil {
+			log.Printf("Error writing message: %s", message)
+		}
 	}
 }
 
 func (c *Client) serveRead() {
+	defer func() {
+		c.hub.unregister <- c
+		_ = c.conn.Close()
+	}()
+
 	for {
 		_, message, err := c.conn.ReadMessage()
 		if err != nil {
@@ -49,7 +53,21 @@ func (c *Client) serveRead() {
 			}
 			break
 		}
-		log.Printf("Message from websocket: %s", message)
+		parsedMessage, err := parseIncomingMessage(c, message)
+		if err != nil {
+			log.Printf("Error parsing client message: %s", err)
+			response, err := json.Marshal(ParseError)
+			if err != nil {
+				log.Fatalf("Error encoding base error response: %s", err)
+			}
+			c.send <- response
+			continue
+		}
+		err = dispatchClientMessage(c.hub.dispatcher, parsedMessage)
+		if err != nil {
+			log.Printf("Error dispatching client action: %s", err)
+			break
+		}
 		c.receive <- message
 	}
 }

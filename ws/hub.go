@@ -4,22 +4,22 @@ type Hub struct {
 	// Registered clients.
 	clients map[*Client]bool
 
-	// Inbound messages from the clients.
-	broadcast chan []byte
-
 	// Register requests from the clients.
 	register chan *Client
 
 	// Unregister requests from clients.
 	unregister chan *Client
+
+	// Action dispatcher for clients.
+	dispatcher *Dispatcher
 }
 
 func CreateHub() *Hub {
 	return &Hub{
 		clients:    make(map[*Client]bool),
-		broadcast:  make(chan []byte),
 		register:   make(chan *Client),
 		unregister: make(chan *Client),
+		dispatcher: &Dispatcher{},
 	}
 }
 
@@ -36,4 +36,8 @@ func (h *Hub) Run() {
 		}
 
 	}
+}
+
+func (h *Hub) AttachDispatcher(dispatcher *Dispatcher) {
+	h.dispatcher = dispatcher
 }
