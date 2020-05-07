@@ -6,15 +6,19 @@ import (
 	"log"
 )
 
+// Dispatcher store available actions for a client and provide methods to pass client request to specific
+// action handler and return response from action handler back to client.
 type Dispatcher struct {
 	actions map[string]func(message *ClientMessage) *Response
 }
 
+// NewDispatcher creates new Dispatcher instance with empty action map.
 func NewDispatcher() *Dispatcher {
 	return &Dispatcher{actions: make(map[string]func(message *ClientMessage) *Response)}
 }
 
-// TODO: star vs no-star
+// AttachAction add new action to dispatcher's action map.
+// TODO: determine if pointer access is required here.
 func (d *Dispatcher) AttachAction(actionName string, action func(message *ClientMessage) *Response) {
 	d.actions[actionName] = action
 }

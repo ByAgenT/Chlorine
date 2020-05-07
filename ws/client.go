@@ -6,7 +6,7 @@ import (
 	"log"
 )
 
-// Client is a middleman between the websocket connection and the hub.
+// Client is a middleman structure between the websocket connection and the websocket hub.
 type Client struct {
 	hub *Hub
 
@@ -25,6 +25,7 @@ func (c *Client) serve() {
 	go c.serveWrite()
 }
 
+// serveWrite handle sending messages to client via websocket connection
 func (c *Client) serveWrite() {
 	for {
 		message, ok := <-c.send
@@ -39,6 +40,7 @@ func (c *Client) serveWrite() {
 	}
 }
 
+// serveRead handles all incoming messages from websocket connection
 func (c *Client) serveRead() {
 	defer func() {
 		c.hub.unregister <- c
