@@ -20,10 +20,17 @@ type Song struct {
 type SongRepository interface {
 	GetRoomSongs(roomID int) ([]Song, error)
 	SaveSong(song *Song) error
+	DeleteSong(songID int) error
 }
 
 type PGSongRepository struct {
 	Storage *DBStorage
+}
+
+func (s PGSongRepository) DeleteSong(songID int) error {
+	query := "DELETE FROM song WHERE id = $1"
+	_, err := s.Storage.Exec(query, songID)
+	return err
 }
 
 func (s PGSongRepository) GetRoomSongs(roomID int) ([]Song, error) {

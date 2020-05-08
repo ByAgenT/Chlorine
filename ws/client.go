@@ -1,11 +1,12 @@
 package ws
 
 import (
+	"encoding/json"
 	"github.com/gorilla/websocket"
 	"log"
 )
 
-// Client is a middleman between the websocket connection and the hub.
+// Client is a middleman structure between the websocket connection and the websocket hub.
 type Client struct {
 	hub *Hub
 
@@ -19,28 +20,39 @@ type Client struct {
 	receive chan []byte
 }
 
-func (c *Client) serve() {
-	defer func() {
-		c.hub.unregister <- c
-		_ = c.conn.Close()
-	}()
+func (c *Client) SendMessage(message []byte) {
+	c.send <- message
+}
 
+func (c *Client) Deregister() {
+	c.hub.unregister <- c
+	_ = c.conn.Close()
+}
+
+func (c *Client) serve() {
 	go c.serveRead()
 	go c.serveWrite()
 }
 
+// serveWrite handle sending messages to client via websocket connection
 func (c *Client) serveWrite() {
 	for {
-		message := <-c.send
-		w, err := c.conn.NextWriter(websocket.TextMessage)
-		if err != nil {
-			return
+		message, ok := <-c.send
+		if !ok {
+			log.Printf("Stopping write goroutine for client %s due to connection close", c.conn.RemoteAddr())
+			break
 		}
-		w.Write(message)
+		err := c.conn.WriteMessage(websocket.TextMessage, message)
+		if err != nil {
+			log.Printf("Error writing message: %s", message)
+		}
 	}
 }
 
+// serveRead handles all incoming messages from websocket connection
 func (c *Client) serveRead() {
+	defer c.Deregister()
+
 	for {
 		_, message, err := c.conn.ReadMessage()
 		if err != nil {
@@ -49,7 +61,31 @@ func (c *Client) serveRead() {
 			}
 			break
 		}
-		log.Printf("Message from websocket: %s", message)
+		parsedMessage, err := parseIncomingMessage(c, message)
+		if err != nil {
+			log.Printf("Error parsing client message: %s", err)
+			response, err := json.Marshal(ParseError)
+			if err != nil {
+				log.Fatalf("Error encoding base error response: %s", err)
+			}
+			c.send <- response
+			continue
+		}
+		err = dispatchClientMessage(c.hub.dispatcher, parsedMessage)
+		if err != nil {
+			log.Printf("Error dispatching client action: %s", err)
+			break
+		}
 		c.receive <- message
+	}
+}
+
+func Broadcast(clients []*Client, message *Response) {
+	response, err := json.Marshal(message)
+	if err != nil {
+		log.Fatalf("Error encoding base error response: %s", err)
+	}
+	for _, client := range clients {
+		go client.SendMessage(response)
 	}
 }

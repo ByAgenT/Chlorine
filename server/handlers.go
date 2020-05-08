@@ -1,5 +1,7 @@
 package server
 
+import "net/http"
+
 var (
 	// Music handler
 	externalMusicHandler ExternalMusicHandler
@@ -20,8 +22,13 @@ var (
 	roomHandler               RoomHandler
 	memberHandler             MemberHandler
 	roomMembersHandler        RoomMembersHandler
+	roomSongsDetailDispatcher DispatchableHandler
+	roomSongsDetailHandler    RoomSongsDetailHandler
 	roomSongsHandler          RoomSongsHandler
 	roomSongsSpotifiedHandler RoomsSongsSpotifiedHandler
+
+	// WebSocket handlers
+	wsHandler WebSocketInitHandler
 )
 
 func initHandlers() {
@@ -46,6 +53,66 @@ func initHandlers() {
 	roomMembersHandler = RoomMembersHandler{MemberService: memberService, RoomService: roomService}
 	roomSongsHandler = RoomSongsHandler{ExternalMusicHandler: externalMusicHandler,
 		SongService: songService, MemberService: memberService, RoomService: roomService}
+	roomSongsDetailHandler = RoomSongsDetailHandler{
+		ExternalMusicHandler: externalMusicHandler,
+		SongService:          songService,
+		MemberService:        memberService,
+		RoomService:          roomService}
+	roomSongsDetailDispatcher = DispatchableHandler{
+		DeleteMethodHandler: roomSongsDetailHandler,
+	}
 	roomSongsSpotifiedHandler = RoomsSongsSpotifiedHandler{
 		ExternalMusicHandler: externalMusicHandler, MemberService: memberService, SongService: songService, RoomService: roomService}
+
+	// WebSocket handlers init
+	wsHandler = WebSocketInitHandler{MemberService: memberService}
+}
+
+type DeleteMethodHandler interface {
+	Delete(w http.ResponseWriter, r *http.Request)
+}
+
+type GetMethodHandler interface {
+	Get(w http.ResponseWriter, r *http.Request)
+}
+
+type PostMethodHandler interface {
+	Post(w http.ResponseWriter, r *http.Request)
+}
+
+type PutMethodHandler interface {
+	Put(w http.ResponseWriter, r *http.Request)
+}
+
+type DispatchableHandler struct {
+	DeleteMethodHandler
+	GetMethodHandler
+	PostMethodHandler
+	PutMethodHandler
+}
+
+func (h DispatchableHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case http.MethodGet:
+		if h.GetMethodHandler != nil {
+			h.GetMethodHandler.Get(w, r)
+			return
+		}
+	case http.MethodPost:
+		if h.PostMethodHandler != nil {
+			h.PostMethodHandler.Post(w, r)
+			return
+		}
+	case http.MethodDelete:
+		if h.DeleteMethodHandler != nil {
+			h.DeleteMethodHandler.Delete(w, r)
+			return
+		}
+	case http.MethodPut:
+		if h.PutMethodHandler != nil {
+			h.PutMethodHandler.Put(w, r)
+			return
+		}
+	}
+	http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 }

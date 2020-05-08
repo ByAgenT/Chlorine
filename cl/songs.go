@@ -18,10 +18,15 @@ type SongService interface {
 	CreateSong(songData RawSong) (*storage.Song, error)
 	UpdateSong(id int, songData RawSong) (*storage.Song, error)
 	GetRoomSongs(roomID int) ([]storage.Song, error)
+	DeleteSong(id int) error
 }
 
 type ChlorineSongService struct {
 	Repository storage.SongRepository
+}
+
+func (s ChlorineSongService) DeleteSong(id int) error {
+	return s.Repository.DeleteSong(id)
 }
 
 // GetRoomSongs return all songs that belongs to the provided room ID.

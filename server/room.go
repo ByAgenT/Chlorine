@@ -4,10 +4,13 @@ import (
 	"chlorine/apierror"
 	"chlorine/auth"
 	"chlorine/cl"
+	"chlorine/ws"
 	"encoding/json"
+	"github.com/gorilla/mux"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/zmb3/spotify"
 )
@@ -164,6 +167,14 @@ func (h RoomSongsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		jsonWriter.WriteJSONObject(song)
+		ws.Broadcast(roomWSConnections[int(member.RoomID)], &ws.Response{
+			Type:        ws.TypeBroadcast,
+			Status:      ws.StatusOK,
+			Description: "SongAdded",
+			Body: map[string]interface{}{
+				"song": song,
+			},
+		})
 		return
 	case "PUT":
 		memberID, ok := session.Values["MemberID"].(int)
@@ -261,6 +272,43 @@ func (h RoomsSongsSpotifiedHandler) ServeHTTP(w http.ResponseWriter, r *http.Req
 			return
 		}
 		jsonWriter.WriteJSONObject(tracks)
+		return
+	}
+}
+
+type RoomSongsDetailHandler struct {
+	auth.Session
+	ExternalMusicHandler
+	SongService   cl.SongService
+	MemberService cl.MemberService
+	RoomService   cl.RoomService
+}
+
+func (h RoomSongsDetailHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case http.MethodDelete:
+		h.Delete(w, r)
+	}
+}
+
+func (h RoomSongsDetailHandler) Delete(w http.ResponseWriter, r *http.Request) {
+	session := h.InitSession(r)
+	jsonWriter := JSONResponseWriter{w}
+	_, ok := session.Values["MemberID"].(int)
+	if !ok {
+		jsonWriter.Error(apierror.APIErrorUnauthorized, http.StatusUnauthorized)
+		return
+	}
+	vars := mux.Vars(r)
+	songID, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		jsonWriter.Error(apierror.APIInvalidRequest, http.StatusBadRequest)
+		return
+	}
+	err = h.SongService.DeleteSong(songID)
+	if err != nil {
+		log.Printf("error deleting song: %s", err)
+		jsonWriter.Error(apierror.APIServerError, http.StatusInternalServerError)
 		return
 	}
 }

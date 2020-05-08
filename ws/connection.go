@@ -6,14 +6,14 @@ import (
 )
 
 var (
-	upgrader = websocket.Upgrader{CheckOrigin: checkOriginFunction}
-
+	upgrader            = websocket.Upgrader{CheckOrigin: checkOriginFunction}
 	checkOriginFunction = func(r *http.Request) bool {
 		return true
 	}
 )
 
-func ServeWSConnection(hub *Hub, w http.ResponseWriter, r *http.Request) {
+// ServeWSConnection initiate websocket handshake and register new connection in websocket hub.
+func ServeWSConnection(hub *Hub, w http.ResponseWriter, r *http.Request) *Client {
 	connection, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		panic("Unhandled upgrade error.")
@@ -26,4 +26,5 @@ func ServeWSConnection(hub *Hub, w http.ResponseWriter, r *http.Request) {
 	}
 	hub.register <- client
 	go client.serve()
+	return client
 }
