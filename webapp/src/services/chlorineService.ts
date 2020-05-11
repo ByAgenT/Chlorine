@@ -381,6 +381,17 @@ class ChlorineService {
       throw new ChlorineServiceError('Error while starting playing');
     }
   }
+
+  public async deleteSong(songId: number): Promise<void> {
+    const response = await fetch(`api/room/songs/${songId}`, {
+      credentials: 'include',
+      method: 'DELETE',
+    });
+
+    if (!response.ok) {
+      throw new ChlorineServiceError('Error while deleting song');
+    }
+  }
 }
 
 export { ChlorineService, ChlorineServiceError };
