@@ -18,7 +18,17 @@ const TrackListItem: React.FC<TrackListItemProps> = ({ img, title, artist, durat
         <TrackArtist>{artist}</TrackArtist>
       </TrackDescriptionContainer>
     </TrackListItemInnerContainer>
-    <TrackDuration>{duration}</TrackDuration>
+    <RightContainer>
+      <TrackDuration>{duration}</TrackDuration>
+      <TrackDeleteButton
+        onClick={() => {
+
+
+
+          alert('he');
+        }}
+      />
+    </RightContainer>
   </TrackListItemContainer>
 );
 
@@ -55,8 +65,25 @@ const TrackArtist = styled.span`
   font-size: 1rem;
 `;
 
+const RightContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  & > * {
+    margin-left: 0.3rem;
+  }
+`;
+
 const TrackDuration = styled.span`
   font-size: 1.3rem;
+`;
+
+const TrackDeleteButton = styled.div`
+  background-image: url('icons/delete-24px.png');
+  background-size: contain;
+  height: 1.2rem;
+  width: 1.2rem;
 `;
 
 export default TrackListItem;
