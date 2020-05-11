@@ -1,6 +1,6 @@
 import * as React from 'react';
 import styled from 'styled-components';
-import { only } from 'styled-breakpoints';
+import { up, down } from 'styled-breakpoints';
 
 const JoinContainer: React.FC = (props) => (
   <JoinOuterContainer>
@@ -13,11 +13,11 @@ const JoinOuterContainer = styled.div`
   min-height: 35rem;
   justify-content: center;
 
-  ${only('tablet')} {
+  ${down('tablet')} {
     flex-direction: column;
   }
 
-  ${only('desktop')} {
+  ${up('desktop')} {
     flex-direction: 'row';
     margin: 10px;
   }
@@ -26,7 +26,7 @@ const JoinOuterContainer = styled.div`
 const JoinInnerContainer = styled.div`
   min-height: 35rem;
 
-  ${only('desktop')} {
+  ${up('desktop')} {
     min-width: 35rem;
   }
 `;

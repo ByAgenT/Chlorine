@@ -8,7 +8,11 @@ import LinkButton from '../components/common/LinkButton';
 import { RouteComponentProps, withRouter } from 'react-router-dom';
 import { ChlorineService } from '../services/chlorineService';
 
-const JoinPage: React.FC<RouteComponentProps> = ({ history }) => {
+interface JoinPageProps extends RouteComponentProps {
+  refreshMember: () => void;
+}
+
+const JoinPage: React.FC<JoinPageProps> = ({ history, refreshMember }) => {
   const [roomID, setRoomID] = useState<number | null>(null);
   const [name, setName] = useState<string>('');
 
@@ -31,7 +35,8 @@ const JoinPage: React.FC<RouteComponentProps> = ({ history }) => {
           onClick={async () => {
             try {
               await new ChlorineService().joinRoom(roomID, name);
-              console.log(roomID, name);
+              console.log(refreshMember);
+              refreshMember();
               history.push('/viewer');
             } catch (error) {
               console.error(error);

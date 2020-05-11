@@ -9,20 +9,12 @@ function useMemberInformation(): [Member | null, () => void] {
     try {
       setMember(await new ChlorineService().getMemberInfo());
     } catch (error) {
-      console.error(error);
+      setMember(null);
     }
   }
 
   useEffect(() => {
-    async function prepare() {
-      try {
-        setMember(await new ChlorineService().getMemberInfo());
-      } catch (error) {
-        console.error(error);
-      }
-    }
-
-    prepare();
+    refreshMember();
   }, []);
 
   return [member, refreshMember];
