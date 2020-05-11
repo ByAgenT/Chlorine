@@ -6,6 +6,7 @@ import Header from './components/Header';
 import PlayerPage from './views/PlayerPage';
 import { useMemberInformation } from './hooks/membership';
 import ViewerPage from './views/ViewerPage';
+import WelcomePage from './views/WelcomePage';
 
 const App = () => {
   let [member, refreshMember] = useMemberInformation();
@@ -15,7 +16,12 @@ const App = () => {
       <div>
         <Header member={member} refreshMember={refreshMember} />
         <Route path='/player' exact component={PlayerPage} />
-        <Route path='/' exact component={JoinPage} />
+        <Route path='/' exact component={WelcomePage} />
+        <Route
+          path='/join'
+          exact
+          render={(props) => <JoinPage {...props} refreshMember={refreshMember} />}
+        />
         <Route path='/viewer' exact component={ViewerPage} />
         <AppStyle />
       </div>
