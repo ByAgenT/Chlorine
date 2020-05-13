@@ -14,7 +14,7 @@ type LoginHandler struct {
 	auth.Session
 }
 
-func (h LoginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (h LoginHandler) Get(w http.ResponseWriter, r *http.Request) {
 	session := h.InitSession(r)
 	jsonWriter := JSONResponseWriter{w}
 
@@ -31,7 +31,7 @@ type CompleteAuthHandler struct {
 	RoomService   cl.RoomService
 }
 
-func (h CompleteAuthHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (h CompleteAuthHandler) Get(w http.ResponseWriter, r *http.Request) {
 	session := h.InitSession(r)
 
 	err := auth.FinishAuthentication(context.Background(), r, session, h.MemberService, h.RoomService)
@@ -49,7 +49,7 @@ type SpotifyTokenHandler struct {
 	auth.Session
 }
 
-func (h SpotifyTokenHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (h SpotifyTokenHandler) Get(w http.ResponseWriter, r *http.Request) {
 	session := h.InitSession(r)
 	jsonWriter := JSONResponseWriter{w}
 

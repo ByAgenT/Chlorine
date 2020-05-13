@@ -11,7 +11,7 @@ type MyPlaylistsHandler struct {
 	ExternalMusicHandler
 }
 
-func (h MyPlaylistsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (h MyPlaylistsHandler) Get(w http.ResponseWriter, r *http.Request) {
 	session := h.InitSession(r)
 	jsonWriter := JSONResponseWriter{w}
 
