@@ -22,7 +22,6 @@ var (
 	roomHandler               RoomHandler
 	memberHandler             MemberHandler
 	roomMembersHandler        RoomMembersHandler
-	roomSongsDetailDispatcher DispatchableHandler
 	roomSongsDetailHandler    RoomSongsDetailHandler
 	roomSongsHandler          RoomSongsHandler
 	roomSongsSpotifiedHandler RoomsSongsSpotifiedHandler
@@ -58,14 +57,24 @@ func initHandlers() {
 		SongService:          songService,
 		MemberService:        memberService,
 		RoomService:          roomService}
-	roomSongsDetailDispatcher = DispatchableHandler{
-		DeleteMethodHandler: roomSongsDetailHandler,
-	}
 	roomSongsSpotifiedHandler = RoomsSongsSpotifiedHandler{
 		ExternalMusicHandler: externalMusicHandler, MemberService: memberService, SongService: songService, RoomService: roomService}
 
 	// WebSocket handlers init
 	wsHandler = WebSocketInitHandler{MemberService: memberService}
+}
+
+func createDispatchableHandler(handler interface{}) DispatchableHandler {
+	deleteHandler, _ := handler.(DeleteMethodHandler)
+	getHandler, _ := handler.(GetMethodHandler)
+	postHandler, _ := handler.(PostMethodHandler)
+	putHandler, _ := handler.(PutMethodHandler)
+	return DispatchableHandler{
+		DeleteMethodHandler: deleteHandler,
+		GetMethodHandler:    getHandler,
+		PostMethodHandler:   postHandler,
+		PutMethodHandler:    putHandler,
+	}
 }
 
 type DeleteMethodHandler interface {
