@@ -15,7 +15,7 @@ const WelcomePage: React.FC<RouteComponentProps> = ({ history }) => {
       <ButtonContainer>
         <Button
           onClick={() => {
-            history.push('/login');
+            window.location.href = '/login';
           }}
         >
           Create a room
