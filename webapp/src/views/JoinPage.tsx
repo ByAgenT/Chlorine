@@ -35,7 +35,6 @@ const JoinPage: React.FC<JoinPageProps> = ({ history, refreshMember }) => {
           onClick={async () => {
             try {
               await new ChlorineService().joinRoom(roomID, name);
-              console.log(refreshMember);
               refreshMember();
               history.push('/viewer');
             } catch (error) {
