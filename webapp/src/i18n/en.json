@@ -1,0 +1,22 @@
+{
+  "name": "CHLORINE",
+  "welcome_description": "Chlorine helps you provide a music to your party that everyone enjoy. Just create a music room using your Spotify account or join already created account. Your friends could join you and add their own music without any registration.",
+  "welcome_create_button": "Create a Room",
+  "welcome_join_button": "Join a Room",
+  "header_logout": "Logout",
+  "header_create": "Create",
+  "header_join": "Join",
+  "user_info_hello": "Hello, ",
+  "playlist": "Playlist",
+  "members": "Members",
+  "player": "Player",
+  "modal_title": "Search Songs",
+  "modal_search_placeholder": "Enter track name...",
+  "modal_exit": "Exit",
+  "add_songs": "Add Songs",
+  "shuffle": "Shuffle",
+  "start_play": "Start Play",
+  "refresh": "Refresh",
+  "your_room": "Your Room: ",
+  "settings": "Settings"
+}

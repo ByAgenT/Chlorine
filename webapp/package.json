@@ -13,11 +13,13 @@
     "build": "webpack -p --mode=production"
   },
   "dependencies": {
+    "i18next": "^19.4.4",
     "lodash": "^4.17.15",
     "mobx": "^5.15.1",
     "mobx-react": "^6.1.4",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
+    "react-i18next": "^11.4.0",
     "react-is": "^16.13.1",
     "react-router-dom": "^5.1.2",
     "styled-breakpoints": "^8.1.0",

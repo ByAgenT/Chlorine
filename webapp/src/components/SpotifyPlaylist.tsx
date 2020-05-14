@@ -4,6 +4,7 @@ import LinkButton from './common/LinkButton';
 import TrackListItem from './TrackListItem';
 import List from './common/List';
 import { SpotifyTrack } from '../models/chlorine';
+import { useTranslation } from 'react-i18next';
 
 function toTrackTime(milliseconds: number): string {
   let date = new Date(milliseconds);
@@ -24,33 +25,37 @@ const SpotifyPlaylist: React.FC<SpotifyPlaylistProps> = ({
   onStartPlay,
   onShuffle,
   onUpdate,
-}) => (
-  <SpotifyPlaylistContainer>
-    <PlaylistList>
-      {playlist
-        ? playlist.map((track) => {
-            return (
-              <TrackListItem
-                key={track.id}
-                title={track.name}
-                artist={track.artists.map((artist) => artist.name).join(', ')}
-                img={
-                  track.album.images.filter((image) => image.width > 50 && image.width < 100)[0].url
-                }
-                duration={toTrackTime(track.durationMs)}
-              />
-            );
-          })
-        : ''}
-    </PlaylistList>
-    <PlaylistBottomBar>
-      <LinkButton onClick={onAddSongClick}>Add Songs</LinkButton>
-      {onShuffle ? <LinkButton onClick={onShuffle}>Shuffle</LinkButton> : ''}
-      {onStartPlay ? <LinkButton onClick={onStartPlay}>Start Play</LinkButton> : ''}
-      <LinkButton onClick={onUpdate}>Refresh</LinkButton>
-    </PlaylistBottomBar>
-  </SpotifyPlaylistContainer>
-);
+}) => {
+  const { t } = useTranslation();
+  return (
+    <SpotifyPlaylistContainer>
+      <PlaylistList>
+        {playlist
+          ? playlist.map((track) => {
+              return (
+                <TrackListItem
+                  key={track.id}
+                  title={track.name}
+                  artist={track.artists.map((artist) => artist.name).join(', ')}
+                  img={
+                    track.album.images.filter((image) => image.width > 50 && image.width < 100)[0]
+                      .url
+                  }
+                  duration={toTrackTime(track.durationMs)}
+                />
+              );
+            })
+          : ''}
+      </PlaylistList>
+      <PlaylistBottomBar>
+        <LinkButton onClick={onAddSongClick}>{t('add_songs')}</LinkButton>
+        {onShuffle ? <LinkButton onClick={onShuffle}>{t('shuffle')}</LinkButton> : ''}
+        {onStartPlay ? <LinkButton onClick={onStartPlay}>{t('start_play')}</LinkButton> : ''}
+        <LinkButton onClick={onUpdate}>{t('refresh')}</LinkButton>
+      </PlaylistBottomBar>
+    </SpotifyPlaylistContainer>
+  );
+};
 
 const SpotifyPlaylistContainer = styled.div`
   display: flex;

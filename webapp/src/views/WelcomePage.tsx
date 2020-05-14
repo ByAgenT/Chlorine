@@ -2,30 +2,29 @@ import * as React from 'react';
 import styled from 'styled-components';
 import { RouteComponentProps } from 'react-router-dom';
 import Button from '../components/common/Button';
+import { useTranslation } from 'react-i18next';
 
 const WelcomePage: React.FC<RouteComponentProps> = ({ history }) => {
+  const { t } = useTranslation();
+
   return (
     <WelcomePageContainer>
-      <Name>CHLORINE</Name>
-      <Description>
-        Chlorine helps you provide a music to your party that everyone enjoy. Just create a music
-        room using your Spotify account or join already created account. Your friends could join you
-        and add their own music without any registration.
-      </Description>
+      <Name>{t('name')}</Name>
+      <Description>{t('welcome_description')}</Description>
       <ButtonContainer>
         <Button
           onClick={() => {
             window.location.href = '/login';
           }}
         >
-          Create a room
+          {t('welcome_create_button')}
         </Button>
         <Button
           onClick={() => {
             history.push('/join');
           }}
         >
-          Join a room
+          {t('welcome_join_button')}
         </Button>
       </ButtonContainer>
     </WelcomePageContainer>
