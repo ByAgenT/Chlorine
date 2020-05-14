@@ -4,10 +4,27 @@ import (
 	"chlorine/apierror"
 	"chlorine/auth"
 	"chlorine/cl"
+	"chlorine/storage"
 	"context"
+	"github.com/gorilla/sessions"
 	"log"
 	"net/http"
 )
+
+func getMemberIfAuthorized(service cl.MemberService,
+	session *sessions.Session) (*storage.Member, bool) {
+	memberID, ok := session.Values["MemberID"].(int)
+	if !ok {
+		return nil, false
+	}
+	member, err := service.GetMember(memberID)
+	if err != nil {
+		// TODO: return false only if NotFound error
+		log.Printf("server: cannot get member for auth check: %s", err)
+		return nil, false
+	}
+	return member, true
+}
 
 // LoginHandler initiates Chlorine room and start OAuth2 authentication flow for Spotify.
 type LoginHandler struct {

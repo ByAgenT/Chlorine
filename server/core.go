@@ -2,8 +2,6 @@ package server
 
 import (
 	"chlorine/apierror"
-	"chlorine/auth"
-	"chlorine/music"
 	"chlorine/storage"
 	"chlorine/ws"
 	"encoding/gob"
@@ -12,8 +10,6 @@ import (
 	"net/http"
 	"os"
 	"time"
-
-	"github.com/gorilla/sessions"
 )
 
 var (
@@ -26,26 +22,6 @@ var (
 		Name:     os.Getenv("POSTGRES_DATABASE")}
 	webSocketHub = ws.CreateHub()
 )
-
-// ExternalMusicHandler contains external MusicService and authentication provider for it to retrieve music information.
-type ExternalMusicHandler struct {
-	auth.Session
-	MusicService           music.Service
-	AuthenticationProvider auth.SessionAuthentication
-}
-
-// GetClient return authenticate music service and return client instance.
-func (h ExternalMusicHandler) GetClient(session *sessions.Session) (music.Client, error) {
-	authenticator, err := h.AuthenticationProvider.GetAuth(session)
-	if err != nil {
-		return nil, err
-	}
-	client, err := h.MusicService.Authenticate(authenticator)
-	if err != nil {
-		return nil, err
-	}
-	return client, nil
-}
 
 // StartChlorineServer starts Chlorine to listen to HTTP connections on the given port.
 func StartChlorineServer(port string) {

@@ -26,14 +26,9 @@ func (h RoomHandler) Get(w http.ResponseWriter, r *http.Request) {
 	session := h.InitSession(r)
 	jsonWriter := JSONResponseWriter{w}
 
-	memberID, ok := session.Values["MemberID"].(int)
+	member, ok := getMemberIfAuthorized(h.MemberService, session)
 	if !ok {
 		jsonWriter.Error(apierror.APIErrorUnauthorized, http.StatusUnauthorized)
-		return
-	}
-	member, err := h.MemberService.GetMember(memberID)
-	if err != nil {
-		log.Printf("server: MemberHandler: cannot retrieve member: %s", err)
 		return
 	}
 	room, err := h.RoomService.GetRoom(int(member.RoomID))
@@ -56,14 +51,9 @@ func (h RoomMembersHandler) Get(w http.ResponseWriter, r *http.Request) {
 	session := h.InitSession(r)
 	jsonWriter := JSONResponseWriter{w}
 
-	memberID, ok := session.Values["MemberID"].(int)
+	member, ok := getMemberIfAuthorized(h.MemberService, session)
 	if !ok {
 		jsonWriter.Error(apierror.APIErrorUnauthorized, http.StatusUnauthorized)
-		return
-	}
-	member, err := h.MemberService.GetMember(memberID)
-	if err != nil {
-		log.Printf("server: RoomMemberHandler: cannot retrieve member: %s", err)
 		return
 	}
 	room, err := h.RoomService.GetRoom(int(member.RoomID))
@@ -93,14 +83,9 @@ type RoomSongsHandler struct {
 func (h RoomSongsHandler) Get(w http.ResponseWriter, r *http.Request) {
 	session := h.InitSession(r)
 	jsonWriter := JSONResponseWriter{w}
-	memberID, ok := session.Values["MemberID"].(int)
+	member, ok := getMemberIfAuthorized(h.MemberService, session)
 	if !ok {
 		jsonWriter.Error(apierror.APIErrorUnauthorized, http.StatusUnauthorized)
-		return
-	}
-	member, err := h.MemberService.GetMember(memberID)
-	if err != nil {
-		log.Printf("server: RoomSongsHandler: cannot retrieve member: %s", err)
 		return
 	}
 	songs, err := h.SongService.GetRoomSongs(int(member.RoomID))
@@ -115,12 +100,11 @@ func (h RoomSongsHandler) Get(w http.ResponseWriter, r *http.Request) {
 func (h RoomSongsHandler) Post(w http.ResponseWriter, r *http.Request) {
 	session := h.InitSession(r)
 	jsonWriter := JSONResponseWriter{w}
-	memberID, ok := session.Values["MemberID"].(int)
+	member, ok := getMemberIfAuthorized(h.MemberService, session)
 	if !ok {
 		jsonWriter.Error(apierror.APIErrorUnauthorized, http.StatusUnauthorized)
 		return
 	}
-	member, err := h.MemberService.GetMember(memberID)
 	room, err := h.RoomService.GetRoom(int(member.RoomID))
 	if err != nil {
 		log.Printf("server: RoomSongsHandler: %s", err.Error())
@@ -171,12 +155,11 @@ func (h RoomSongsHandler) Post(w http.ResponseWriter, r *http.Request) {
 func (h RoomSongsHandler) Put(w http.ResponseWriter, r *http.Request) {
 	session := h.InitSession(r)
 	jsonWriter := JSONResponseWriter{w}
-	memberID, ok := session.Values["MemberID"].(int)
+	member, ok := getMemberIfAuthorized(h.MemberService, session)
 	if !ok {
 		jsonWriter.Error(apierror.APIErrorUnauthorized, http.StatusUnauthorized)
 		return
 	}
-	member, err := h.MemberService.GetMember(memberID)
 	room, err := h.RoomService.GetRoom(int(member.RoomID))
 	if err != nil {
 		log.Printf("server: RoomSongsHandler: %s", err.Error())
@@ -229,14 +212,9 @@ type RoomsSongsSpotifiedHandler struct {
 func (h RoomsSongsSpotifiedHandler) Get(w http.ResponseWriter, r *http.Request) {
 	session := h.InitSession(r)
 	jsonWriter := JSONResponseWriter{w}
-	memberID, ok := session.Values["MemberID"].(int)
+	member, ok := getMemberIfAuthorized(h.MemberService, session)
 	if !ok {
 		jsonWriter.Error(apierror.APIErrorUnauthorized, http.StatusUnauthorized)
-		return
-	}
-	member, err := h.MemberService.GetMember(memberID)
-	if err != nil {
-		log.Printf("server: RoomSongsHandler: cannot retrieve member: %s", err)
 		return
 	}
 	room, err := h.RoomService.GetRoom(int(member.RoomID))
@@ -274,7 +252,7 @@ type RoomSongsDetailHandler struct {
 func (h RoomSongsDetailHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	session := h.InitSession(r)
 	jsonWriter := JSONResponseWriter{w}
-	_, ok := session.Values["MemberID"].(int)
+	member, ok := getMemberIfAuthorized(h.MemberService, session)
 	if !ok {
 		jsonWriter.Error(apierror.APIErrorUnauthorized, http.StatusUnauthorized)
 		return
@@ -291,4 +269,12 @@ func (h RoomSongsDetailHandler) Delete(w http.ResponseWriter, r *http.Request) {
 		jsonWriter.Error(apierror.APIServerError, http.StatusInternalServerError)
 		return
 	}
+	ws.Broadcast(roomWSConnections[int(member.RoomID)], &ws.Response{
+		Type:        ws.TypeBroadcast,
+		Status:      ws.StatusOK,
+		Description: "SongDeleted",
+		Body: map[string]interface{}{
+			"songID": songID,
+		},
+	})
 }

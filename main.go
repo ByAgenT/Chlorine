@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	// ServerPort is a default value for host.
+	// ServerHost is a default value for host.
 	ServerHost = "localhost"
 
 	// ServerPort is a default value for port.
