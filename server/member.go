@@ -22,13 +22,10 @@ type MemberHandler struct {
 func (h MemberHandler) Get(w http.ResponseWriter, r *http.Request) {
 	session := h.InitSession(r)
 	jsonWriter := JSONResponseWriter{w}
-	memberID, ok := session.Values["MemberID"].(int)
+	member, ok := getMemberIfAuthorized(h.MemberService, session)
 	if !ok {
 		jsonWriter.Error(apierror.APIErrorUnauthorized, http.StatusUnauthorized)
-	}
-	member, err := h.MemberService.GetMember(memberID)
-	if err != nil {
-		log.Printf("server: MemberHandler: cannot retrieve member: %s", err)
+		return
 	}
 	jsonWriter.WriteJSONObject(member)
 }
