@@ -1,0 +1,22 @@
+{
+  "name": "CHLORINE",
+  "welcome_description": "Chlorine позволяет вам и вашим друзьям добавить музыки на вашу вечеринку без лишних хлопот. Создайте музыкальную комнату, используя Spotify аккаунт и позовите в нее друзей, все просто, и никакой регистрации.",
+  "welcome_create_button": "Создать комнату",
+  "welcome_join_button": "Присоединиться",
+  "header_logout": "Выйти",
+  "header_create": "Создать",
+  "header_join": "Присоединиться",
+  "user_info_hello": "Привет, ",
+  "playlist": "Плейлист",
+  "members": "Участники",
+  "player": "Проигрыватель",
+  "modal_title": "Поиск песен",
+  "modal_search_placeholder": "Введите название песни сюда...",
+  "modal_exit": "Выйти",
+  "add_songs": "Добавить песню",
+  "shuffle": "Перемешать",
+  "start_play": "Запустить",
+  "refresh": "Обновить",
+  "your_room": "Твоя комната: ",
+  "settings": "Настройки"
+}

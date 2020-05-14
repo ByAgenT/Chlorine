@@ -1,19 +1,21 @@
 import * as React from 'react';
 import styled from 'styled-components';
 import LinkButton from './LinkButton';
+import { useTranslation } from "react-i18next";
 
 interface ModalProps extends React.HTMLAttributes<HTMLDivElement> {
   display: [boolean, (newValue: boolean) => void];
 }
 
 const Modal: React.FC<ModalProps> = ({ display, children, className }) => {
+  const {t} = useTranslation();
   let [displayStatus, setDisplayStatus] = display;
   return (
     <ModalContainer display={displayStatus ? 'block' : 'none'}>
       <ModalContent className={className}>
         {children}
         <ModalBottomBar>
-          <LinkButton onClick={() => setDisplayStatus(false)}>Exit</LinkButton>
+          <LinkButton onClick={() => setDisplayStatus(false)}>{t('modal_exit')}</LinkButton>
         </ModalBottomBar>
       </ModalContent>
     </ModalContainer>

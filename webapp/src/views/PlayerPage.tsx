@@ -15,8 +15,10 @@ import SpotifyPlaylist from '../components/SpotifyPlaylist';
 import TextInput from '../components/common/TextInput';
 import Modal from '../components/common/Modal';
 import SongSearchResultList from '../components/SongSearchResultList';
+import { useTranslation } from 'react-i18next';
 
 const PlayerPage: React.FC = () => {
+  const { t } = useTranslation();
   const player = useSpotifyPlayer();
   const [members, updateMembers] = useMembersList();
   const playback = usePlaybackInformation(player);
@@ -66,7 +68,7 @@ const PlayerPage: React.FC = () => {
   return (
     <RootPartyContainer>
       <PartyContainer direction='column'>
-        <Panel name='Playlist'>
+        <Panel name={t('playlist')}>
           <SpotifyPlaylist
             onAddSongClick={() => setModalShowed(!isModalShowed)}
             onStartPlay={startPlay}
@@ -77,15 +79,15 @@ const PlayerPage: React.FC = () => {
         </Panel>
       </PartyContainer>
       <PartyContainer direction='column'>
-        <Panel name='Members'>
-          <MembersList members={members} onUpdate={updateMembers}/>
+        <Panel name={t('members')}>
+          <MembersList members={members} onUpdate={updateMembers} />
         </Panel>
-        <Panel name='Player'>{<Player player={player} playback={playback}/>}</Panel>
+        <Panel name={t('player')}>{<Player player={player} playback={playback} />}</Panel>
       </PartyContainer>
       <Modal display={[isModalShowed, setModalShowed]}>
-        <h1>Search Songs</h1>
-        <TextInput placeholder='Enter Track' onChange={onSearchModalChange}/>
-        <SongSearchResultList onSongAdd={appendSong} songs={searchResult}/>
+        <h1>{t('modal_title')}</h1>
+        <TextInput placeholder={t('modal_search_placeholder')} onChange={onSearchModalChange} />
+        <SongSearchResultList onSongAdd={appendSong} songs={searchResult} />
       </Modal>
     </RootPartyContainer>
   );

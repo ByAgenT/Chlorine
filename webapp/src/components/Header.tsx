@@ -3,6 +3,7 @@ import { RouteComponentProps, withRouter } from 'react-router-dom';
 import styled from 'styled-components';
 import LinkButton from './common/LinkButton';
 import { Member } from '../models/chlorine';
+import { useTranslation } from 'react-i18next';
 
 interface UserInfoProps {
   name: string;
@@ -13,33 +14,37 @@ interface HeaderProps extends RouteComponentProps {
   refreshMember?: () => void;
 }
 
-const Header: React.FC<HeaderProps> = ({ member, refreshMember, history }) => (
-  <HeaderContainer>
-    <Brand>CHLORINE</Brand>
-    {member ? (
-      <div>
-        <UserInfo name={member.name} />
-        <HeaderButton
-          onClick={() => {
-            function deleteSessionCookie() {
-              document.cookie = 'chlorine_session=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-            }
-            deleteSessionCookie();
-            refreshMember();
-            history.push('/');
-          }}
-        >
-          Logout
-        </HeaderButton>
-      </div>
-    ) : (
-      <HeaderMenu>
-        <HeaderButton href='/login'>Create</HeaderButton>
-        <HeaderButton href='/join'>Join</HeaderButton>
-      </HeaderMenu>
-    )}
-  </HeaderContainer>
-);
+const Header: React.FC<HeaderProps> = ({ member, refreshMember, history }) => {
+  const { t } = useTranslation();
+  return (
+    <HeaderContainer>
+      <Brand>{t('name')}</Brand>
+      {member ? (
+        <div>
+          <UserInfo name={member.name} />
+          <HeaderButton
+            onClick={() => {
+              function deleteSessionCookie() {
+                document.cookie = 'chlorine_session=;expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+              }
+
+              deleteSessionCookie();
+              refreshMember();
+              history.push('/');
+            }}
+          >
+            {t('header_logout')}
+          </HeaderButton>
+        </div>
+      ) : (
+        <HeaderMenu>
+          <HeaderButton href='/login'>{t('header_create')}</HeaderButton>
+          <HeaderButton href='/join'>{t('header_join')}</HeaderButton>
+        </HeaderMenu>
+      )}
+    </HeaderContainer>
+  );
+};
 
 const HeaderContainer = styled.header`
   background-color: black;
@@ -50,9 +55,10 @@ const HeaderContainer = styled.header`
   align-items: center;
 `;
 
-const UserInfo: React.FC<UserInfoProps> = ({ name }) => (
-  <UserInfoSpan>{`Hello, ${name}`}</UserInfoSpan>
-);
+const UserInfo: React.FC<UserInfoProps> = ({ name }) => {
+  const { t } = useTranslation();
+  return <UserInfoSpan>{`${t('user_info_hello')} ${name}`}</UserInfoSpan>;
+};
 
 const UserInfoSpan = styled.span`
   font-size: 1.15rem;
