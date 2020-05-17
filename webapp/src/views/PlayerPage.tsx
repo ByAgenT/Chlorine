@@ -1,4 +1,4 @@
-import { withRouter } from 'react-router-dom';
+import { RouteComponentProps, withRouter } from 'react-router-dom';
 import RootPartyContainer from '../containers/RootPartyContainer';
 import * as React from 'react';
 import { useEffect, useState } from 'react';
@@ -12,12 +12,17 @@ import debounce from 'lodash/debounce';
 import MembersList from '../components/MembersList';
 import Player from '../components/Player';
 import SpotifyPlaylist from '../components/SpotifyPlaylist';
-import TextInput from '../components/common/TextInput';
-import Modal from '../components/common/Modal';
-import SongSearchResultList from '../components/SongSearchResultList';
 import { useTranslation } from 'react-i18next';
+import AddSongsModal from '../containers/AddSongsModal';
+import styled from 'styled-components';
+import Settings from '../components/Settings';
+import { Member } from '../models/chlorine';
 
-const PlayerPage: React.FC = () => {
+interface PlayerPageProps extends RouteComponentProps {
+  member: Member | null;
+}
+
+const PlayerPage: React.FC<PlayerPageProps> = ({ member }) => {
   const { t } = useTranslation();
   const player = useSpotifyPlayer();
   const [members, updateMembers] = useMembersList();
@@ -65,6 +70,7 @@ const PlayerPage: React.FC = () => {
 
   useEffect(claimPlayback);
 
+  const roomId = member ? member.roomId : NaN;
   return (
     <RootPartyContainer>
       <PartyContainer direction='column'>
@@ -80,17 +86,28 @@ const PlayerPage: React.FC = () => {
       </PartyContainer>
       <PartyContainer direction='column'>
         <Panel name={t('members')}>
-          <MembersList members={members} onUpdate={updateMembers} />
+          <ManagementContainer>
+            <MembersList members={members} onUpdate={updateMembers} />
+            <Settings roomId={roomId} />
+          </ManagementContainer>
         </Panel>
         <Panel name={t('player')}>{<Player player={player} playback={playback} />}</Panel>
       </PartyContainer>
-      <Modal display={[isModalShowed, setModalShowed]}>
-        <h1>{t('modal_title')}</h1>
-        <TextInput placeholder={t('modal_search_placeholder')} onChange={onSearchModalChange} />
-        <SongSearchResultList onSongAdd={appendSong} songs={searchResult} />
-      </Modal>
+      <AddSongsModal
+        isShowed={isModalShowed}
+        onClose={setModalShowed}
+        onSearchValueChange={onSearchModalChange}
+        onSongAdd={appendSong}
+        songs={searchResult}
+      />
     </RootPartyContainer>
   );
 };
+
+const ManagementContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  height: 100%;
+`;
 
 export default withRouter(PlayerPage);

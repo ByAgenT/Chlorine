@@ -15,7 +15,6 @@ const Panel: React.FC<PanelProps> = (props) => (
 
 const PanelContainer = styled.div`
   border: 1px solid #616467;
-  margin: 1rem;
   flex-grow: 1;
   display: flex;
   flex-direction: column;
@@ -37,7 +36,7 @@ const PanelBody = styled.div`
 
 const PanelHeader = styled.div`
   background-color: #292929;
-  padding: 10px 15px;
+  padding: 0.5rem 0.75rem;
   font-size: 1rem;
   border-bottom: 1px dashed #616467;
   color: white;

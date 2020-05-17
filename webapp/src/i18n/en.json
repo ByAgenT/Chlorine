@@ -17,6 +17,7 @@
   "shuffle": "Shuffle",
   "start_play": "Start Play",
   "refresh": "Refresh",
-  "your_room": "Your Room: ",
-  "settings": "Settings"
+  "your_room": "Your Room ID is ",
+  "settings": "Settings",
+  "link": "Get Link"
 }

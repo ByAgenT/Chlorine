@@ -8,13 +8,12 @@ interface SongSearchResultListProps {
   onSongAdd: (id: string) => void;
 }
 
-const SongSearchResultList = ({ songs, onSongAdd }) => (
+const SongSearchResultList: React.FC<SongSearchResultListProps> = ({ songs, onSongAdd }) => (
   <ListContainer>
     <SongsList>
       {songs.map((song) => (
         <LinkButton
           onClick={() => {
-            console.log(`Add ${song.id}`);
             onSongAdd(song.id);
           }}
           key={song.id}

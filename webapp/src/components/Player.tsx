@@ -100,10 +100,10 @@ const ButtonsContainer = styled.div`
 
 const SongTitle = styled.div`
   font-weight: 600;
-  margin-bottom: 1em;
   font-size: 1.6rem;
-  max-width: 15rem;
-  ${down('tablet')} {
+  text-align: center;
+  height: 4.5rem;
+  ${down('desktop')} {
     font-size: 1rem;
   }
 

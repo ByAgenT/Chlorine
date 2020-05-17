@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import JoinContainer from '../containers/JoinContainer';
 import styled from 'styled-components';
 import Panel from '../components/common/Panel';
@@ -12,20 +12,31 @@ interface JoinPageProps extends RouteComponentProps {
   refreshMember: () => void;
 }
 
-const JoinPage: React.FC<JoinPageProps> = ({ history, refreshMember }) => {
+const JoinPage: React.FC<JoinPageProps> = ({ history, location, refreshMember }) => {
   const [roomID, setRoomID] = useState<number | null>(null);
   const [name, setName] = useState<string>('');
+
+  useEffect(() => {
+    // If 'room' query parameter is provided, we need to prefill Room Id text input with this value.
+    const queryParams = new URLSearchParams(location.search);
+    setRoomID(Number(queryParams.get('room')));
+  }, [location]);
 
   return (
     <JoinContainer>
       <JoinPanel name='Join a Room'>
         <TextInput
+          value={roomID ? roomID.toString() : ''}
           onChange={(event) => {
-            setRoomID(Number(event.currentTarget.value));
+            const targetValue = Number(event.currentTarget.value);
+            if (!isNaN(targetValue)) {
+              setRoomID(targetValue);
+            }
           }}
           placeholder='Room ID'
         />
         <TextInput
+          value={name}
           onChange={(event) => {
             setName(event.currentTarget.value);
           }}
@@ -50,8 +61,8 @@ const JoinPage: React.FC<JoinPageProps> = ({ history, refreshMember }) => {
 };
 
 const JoinPanel = styled(Panel)`
-  & * {
-    margin: 0.7rem 1rem;
+  & > * {
+    margin: 1rem 1.5rem;
   }
 `;
 
