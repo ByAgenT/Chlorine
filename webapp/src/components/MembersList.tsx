@@ -4,7 +4,7 @@ import List from './common/List';
 import LinkButton from './common/LinkButton';
 import ListItem from './common/ListItem';
 import { Member } from '../models/chlorine';
-import { useTranslation } from "react-i18next";
+import { useTranslation } from 'react-i18next';
 
 interface MembersListProps {
   members: Member[];
@@ -12,7 +12,7 @@ interface MembersListProps {
 }
 
 const MembersList: React.FC<MembersListProps> = ({ members, onUpdate }) => {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   return (
     <MemberListContainer>
       <List>
@@ -21,25 +21,11 @@ const MembersList: React.FC<MembersListProps> = ({ members, onUpdate }) => {
         })}
       </List>
       <MemberListBottomBar>
-        <RoomButton>{t('your_room')} {members[0] ? members[0].roomId : ''}</RoomButton>
-        <LinkButton
-          onClick={() => {
-            alert('In development');
-          }}
-        >
-          {t('settings')}
-        </LinkButton>
         <LinkButton onClick={onUpdate}>{t('refresh')}</LinkButton>
       </MemberListBottomBar>
     </MemberListContainer>
   );
 };
-
-const RoomButton = styled(LinkButton)`
-  &:hover {
-    color: white;
-  }
-`;
 
 const MembersListItem = styled(ListItem)`
   font-size: 1.5em;
@@ -50,6 +36,7 @@ const MemberListBottomBar = styled.div`
   height: 2.5rem;
   color: white;
   background-color: #292929;
+  border-top: 1px dashed #616467;
   align-items: center;
 `;
 

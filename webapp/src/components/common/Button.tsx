@@ -10,7 +10,7 @@ const Button = styled.button`
   text-decoration: none;
   display: inline-block;
   font-size: 1.15rem;
-  font-weight: 600;
+  font-weight: 500;
 
   &:hover {
     background-color: #64dd66;

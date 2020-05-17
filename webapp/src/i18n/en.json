@@ -17,6 +17,11 @@
   "shuffle": "Shuffle",
   "start_play": "Start Play",
   "refresh": "Refresh",
-  "your_room": "Your Room: ",
-  "settings": "Settings"
+  "your_room": "Your Room ID is ",
+  "settings": "Settings",
+  "link": "Get Link",
+  "songs_per_member": "Songs per member: ",
+  "max_members": "Max members: ",
+  "invitation_link": "Invitation Link",
+  "invitation_modal_description": "Press on the link to copy it to clipboard."
 }

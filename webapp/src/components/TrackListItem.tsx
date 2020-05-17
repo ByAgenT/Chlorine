@@ -1,6 +1,7 @@
 import * as React from 'react';
 import styled from 'styled-components';
 import ListItem from './common/ListItem';
+import { AlignedCenterFlex } from '../containers/common/AlignedCenterFlex';
 
 interface TrackListItemProps {
   img: string;
@@ -11,20 +12,17 @@ interface TrackListItemProps {
 
 const TrackListItem: React.FC<TrackListItemProps> = ({ img, title, artist, duration }) => (
   <TrackListItemContainer>
-    <TrackListItemInnerContainer>
+    <AlignedCenterFlex>
       <TrackImage src={img} />
       <TrackDescriptionContainer>
         <TrackTitle>{title}</TrackTitle>
         <TrackArtist>{artist}</TrackArtist>
       </TrackDescriptionContainer>
-    </TrackListItemInnerContainer>
+    </AlignedCenterFlex>
     <RightContainer>
       <TrackDuration>{duration}</TrackDuration>
       <TrackDeleteButton
         onClick={() => {
-
-
-
           alert('he');
         }}
       />
@@ -38,11 +36,6 @@ const TrackListItemContainer = styled(ListItem)`
   &:hover {
     background-color: #222326;
   }
-`;
-
-const TrackListItemInnerContainer = styled.div`
-  display: flex;
-  align-items: center;
 `;
 
 const TrackImage = styled.img`

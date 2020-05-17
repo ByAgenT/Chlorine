@@ -9,13 +9,11 @@ import PartyContainer from '../containers/PartyContainer';
 import Panel from '../components/common/Panel';
 import SpotifyPlaylist from '../components/SpotifyPlaylist';
 import MembersList from '../components/MembersList';
-import Modal from '../components/common/Modal';
-import TextInput from '../components/common/TextInput';
-import SongSearchResultList from '../components/SongSearchResultList';
-import { useTranslation } from "react-i18next";
+import { useTranslation } from 'react-i18next';
+import AddSongsModal from '../containers/AddSongsModal';
 
 const PartyPage: React.FC = () => {
-  const {t} = useTranslation();
+  const { t } = useTranslation();
   const [members, updateMembers] = useMembersList();
   const [isModalShowed, setModalShowed] = useState<boolean>(false);
   const { searchResult, setSongQuery } = useSongSearch();
@@ -52,14 +50,16 @@ const PartyPage: React.FC = () => {
       </PartyContainer>
       <PartyContainer direction='column'>
         <Panel name={t('members')}>
-          <MembersList members={members} onUpdate={updateMembers}/>
+          <MembersList members={members} onUpdate={updateMembers} />
         </Panel>
       </PartyContainer>
-      <Modal display={[isModalShowed, setModalShowed]}>
-        <h1>{t('modal_title')}</h1>
-        <TextInput placeholder={t('modal_search_placeholder')} onChange={onSearchModalChange} />
-        <SongSearchResultList onSongAdd={appendSong} songs={searchResult}/>
-      </Modal>
+      <AddSongsModal
+        isShowed={isModalShowed}
+        onClose={setModalShowed}
+        onSearchValueChange={onSearchModalChange}
+        onSongAdd={appendSong}
+        songs={searchResult}
+      />
     </RootPartyContainer>
   );
 };

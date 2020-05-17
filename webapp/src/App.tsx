@@ -15,7 +15,11 @@ const App = () => {
     <Router>
       <div>
         <Header member={member} refreshMember={refreshMember} />
-        <Route path='/player' exact component={PlayerPage} />
+        <Route
+          path='/player'
+          exact
+          render={(props) => <PlayerPage {...props} member={member} />}
+        />
         <Route path='/' exact component={WelcomePage} />
         <Route
           path='/join'

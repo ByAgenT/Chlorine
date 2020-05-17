@@ -77,7 +77,7 @@ const PlaylistList = styled(List)`
   flex-direction: column;
   flex-grow: 1;
   overflow-y: scroll;
-  max-height: 50em;
+  max-height: 35rem;
 `;
 
 export default SpotifyPlaylist;

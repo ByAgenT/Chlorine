@@ -27,10 +27,13 @@ module.exports = {
   plugins: [
     new webpack.optimize.ModuleConcatenationPlugin(),
     new HtmlWebpackPlugin({
-      template: 'static/index.html',
+      template: 'src/static/index.html',
       filename: 'index.html',
     }),
-    new CopyWebpackPlugin([{ from: 'static/icons', to: 'icons' }]),
+    new CopyWebpackPlugin([
+      { from: 'src/static/icons', to: 'icons' },
+      { from: 'src/static/fonts', to: 'fonts' },
+    ]),
   ],
   devServer: {
     contentBase: path.join(__dirname, 'dist'),

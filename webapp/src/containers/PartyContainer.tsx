@@ -3,19 +3,31 @@ import { down, up } from 'styled-breakpoints';
 
 interface PartyContainerProps {
   direction?: string;
+  horizontalAlign?: string;
 }
 
 const PartyContainer = styled.div<PartyContainerProps>`
   display: flex;
-  min-height: 35rem;
+  height: 40rem;
   flex-grow: 1;
-  ${down('tablet')} {
+  align-items: center;
+
+  ${down('desktop')} {
     flex-direction: column;
   }
 
   ${up('desktop')} {
     flex-direction: ${(props) => props.direction || 'row'};
     margin: 10px;
+  }
+
+  & > * {
+    margin: 1rem;
+    width: 40rem;
+
+    ${up('desktop')} {
+      width: 50rem;
+    }
   }
 `;
 
