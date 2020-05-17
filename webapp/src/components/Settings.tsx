@@ -6,7 +6,9 @@ import TextSpan from './common/TextSpan';
 import TextInput from './common/TextInput';
 import { HorizontalFlex } from '../containers/common/HorizontalFlex';
 import { useState } from 'react';
-import set = Reflect.set;
+import Modal from './common/Modal';
+import LinkButton from './common/LinkButton';
+import RoomLinkModal from '../containers/RoomLinkModal';
 
 interface SettingsProps {
   roomId: number;
@@ -16,6 +18,7 @@ const Settings: React.FC<SettingsProps> = ({ roomId }) => {
   const { t } = useTranslation();
   const [songsPerMember, setSongsPerMember] = useState<number>(0);
   const [maxMembers, setMaxMembers] = useState<number>(0);
+  const [showLinkModal, setLinkModal] = useState<boolean>(false);
 
   return (
     <SettingsContainer>
@@ -24,7 +27,7 @@ const Settings: React.FC<SettingsProps> = ({ roomId }) => {
       </TextSpan>
       <ValueSettingsContainer>
         <HorizontalFlex justifyContent='space-between' width='15rem'>
-          <TextSpan>Songs per member:</TextSpan>
+          <TextSpan>{t('songs_per_member')}</TextSpan>
           <TextInput
             onChange={(event) => {
               const targetValue = Number(event.currentTarget.value);
@@ -37,7 +40,7 @@ const Settings: React.FC<SettingsProps> = ({ roomId }) => {
           />
         </HorizontalFlex>
         <HorizontalFlex justifyContent='space-between' width='15rem'>
-          <TextSpan>Max users:</TextSpan>
+          <TextSpan>{t('max_members')}</TextSpan>
           <TextInput
             onChange={(event) => {
               const targetValue = Number(event.currentTarget.value);
@@ -51,8 +54,15 @@ const Settings: React.FC<SettingsProps> = ({ roomId }) => {
         </HorizontalFlex>
       </ValueSettingsContainer>
       <div>
-        <GetRoomLinkButton>{t('link')}</GetRoomLinkButton>
+        <GetRoomLinkButton
+          onClick={() => {
+            setLinkModal(true);
+          }}
+        >
+          {t('link')}
+        </GetRoomLinkButton>
       </div>
+      <RoomLinkModal visibility={showLinkModal} close={setLinkModal} roomId={roomId} />
     </SettingsContainer>
   );
 };

@@ -23,11 +23,12 @@ const TextInput: React.FC<TextInputProps> = ({ onChange, placeholder, value, wid
 
 const TextInputInput = styled.input`
   width: ${(props) => (props.width ? props.width : '-webkit-fill-available')};
-  width: ${(props) => (props.width ? props.width : '--moz-available')};
+  width: ${(props) => (props.width ? props.width : '-moz-available')};
   font-size: 2em;
-  color: rgb(29, 185, 84);
+  color: white;
   background: none;
   border: none;
+  border-bottom: 1px dashed #616467;
   outline: none;
 `;
 

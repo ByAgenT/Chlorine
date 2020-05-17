@@ -22,8 +22,7 @@ const AddSongsModal: React.FC<AddSongsModalProps> = ({
 }) => {
   const { t } = useTranslation();
   return (
-    <Modal display={[isShowed, onClose]}>
-      <h1>{t('modal_title')}</h1>
+    <Modal title={t('modal_title')} display={[isShowed, onClose]}>
       <TextInput placeholder={t('modal_search_placeholder')} onChange={onSearchValueChange} />
       <SongSearchResultList onSongAdd={onSongAdd} songs={songs} />
     </Modal>
