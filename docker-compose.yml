@@ -16,7 +16,7 @@ services:
       context: ./webapp
       dockerfile: Dockerfile
     volumes:
-      - /etc/letsencrypt/
+      - /etc/letsencrypt:/etc/letsencrypt
     ports:
       - 80:80
       - 443:443
