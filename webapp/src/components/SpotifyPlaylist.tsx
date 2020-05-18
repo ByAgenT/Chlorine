@@ -5,11 +5,7 @@ import TrackListItem from './TrackListItem';
 import List from './common/List';
 import { SpotifyTrack } from '../models/chlorine';
 import { useTranslation } from 'react-i18next';
-
-function toTrackTime(milliseconds: number): string {
-  let date = new Date(milliseconds);
-  return `${date.getMinutes()}:${date.getSeconds()}`;
-}
+import { toTrackTime } from '../utils/time';
 
 interface SpotifyPlaylistProps {
   onAddSongClick: (event: React.MouseEvent) => void;

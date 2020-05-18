@@ -1,17 +1,10 @@
 import * as React from 'react';
 import styled from 'styled-components';
-import { format } from 'date-fns';
+import { toTrackTime } from '../utils/time';
 
 interface SongLineProps {
   now: number;
   duration: number;
-}
-
-function toTrackTime(milliseconds) {
-  if (isNaN(milliseconds)) {
-    return '00:00';
-  }
-  return format(milliseconds, 'mm:ss');
 }
 
 const SongLine: React.FC<SongLineProps> = (props) => (
@@ -32,7 +25,6 @@ const SongLineContainer = styled.div`
 
 const SongTime = styled.span`
   font-size: 1.2rem;
-  //font-weight: 600;
 `;
 
 const SongLineTotal = styled.div`

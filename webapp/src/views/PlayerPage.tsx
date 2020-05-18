@@ -1,14 +1,12 @@
 import { RouteComponentProps, withRouter } from 'react-router-dom';
 import RootPartyContainer from '../containers/RootPartyContainer';
 import * as React from 'react';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import PartyContainer from '../containers/PartyContainer';
 import Panel from '../components/common/Panel';
 import { usePlaybackInformation, useSpotifyPlayer, useSpotifyPlaylist } from '../hooks/player';
 import { useMembersList } from '../hooks/membership';
-import { useSongSearch } from '../hooks/search';
 import { ChlorineService } from '../services/chlorineService';
-import debounce from 'lodash/debounce';
 import MembersList from '../components/MembersList';
 import Player from '../components/Player';
 import SpotifyPlaylist from '../components/SpotifyPlaylist';
@@ -17,6 +15,7 @@ import AddSongsModal from '../containers/AddSongsModal';
 import styled from 'styled-components';
 import Settings from '../components/Settings';
 import { Member } from '../models/chlorine';
+import useChlorineWebSocket from '../hooks/websocket';
 
 interface PlayerPageProps extends RouteComponentProps {
   member: Member | null;
@@ -28,7 +27,7 @@ const PlayerPage: React.FC<PlayerPageProps> = ({ member }) => {
   const [members, updateMembers] = useMembersList();
   const playback = usePlaybackInformation(player);
   const [isModalShowed, setModalShowed] = useState<boolean>(false);
-  const { searchResult, setSongQuery } = useSongSearch();
+  const webSocketConnection = useChlorineWebSocket();
   const {
     spotifyTrackInfo,
     fetchPlaylist,
@@ -38,20 +37,11 @@ const PlayerPage: React.FC<PlayerPageProps> = ({ member }) => {
     doShuffle,
   } = useSpotifyPlaylist();
 
-  const updateSongQuery = debounce((event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setSongQuery(event.target.value);
-  }, 200);
-
-  function onSearchModalChange(event: React.ChangeEvent<HTMLTextAreaElement>) {
-    event.persist();
-    updateSongQuery(event);
-  }
-
-  function updatePlaylist() {
+  const updatePlaylist = useCallback(() => {
     return Promise.all([fetchPlaylist(), fetchSpotifyTrackInfo()]);
-  }
+  }, [fetchPlaylist, fetchSpotifyTrackInfo]);
 
-  function claimPlayback() {
+  const claimPlayback = useCallback(() => {
     if (player) {
       player.onPlayerReady(async () => {
         const chlorineService = new ChlorineService();
@@ -66,9 +56,23 @@ const PlayerPage: React.FC<PlayerPageProps> = ({ member }) => {
         }
       });
     }
-  }
+  }, [player]);
 
   useEffect(claimPlayback);
+
+  useEffect(() => {
+    webSocketConnection.onBroadcast('SongAdded', () => {
+      updatePlaylist();
+    });
+    webSocketConnection.onBroadcast('MemberAdded', () => {
+      updateMembers();
+    });
+
+    return () => {
+      webSocketConnection.removeOnBroadcastListener('SongAdded');
+      webSocketConnection.removeOnBroadcastListener('MemberAdded');
+    };
+  }, [updatePlaylist, webSocketConnection, updateMembers]);
 
   const roomId = member ? member.roomId : NaN;
   return (
@@ -93,13 +97,7 @@ const PlayerPage: React.FC<PlayerPageProps> = ({ member }) => {
         </Panel>
         <Panel name={t('player')}>{<Player player={player} playback={playback} />}</Panel>
       </PartyContainer>
-      <AddSongsModal
-        isShowed={isModalShowed}
-        onClose={setModalShowed}
-        onSearchValueChange={onSearchModalChange}
-        onSongAdd={appendSong}
-        songs={searchResult}
-      />
+      <AddSongsModal isShowed={isModalShowed} onClose={setModalShowed} onSongAdd={appendSong} />
     </RootPartyContainer>
   );
 };

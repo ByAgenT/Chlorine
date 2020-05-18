@@ -16,8 +16,11 @@ type Client struct {
 	// Buffered channel of outbound messages.
 	send chan []byte
 
-	// Channel of incoming messages
+	// Channel of incoming messages.
 	receive chan []byte
+
+	// Indicator of a connection that is dead and should not be used.
+	dead bool
 }
 
 func (c *Client) SendMessage(message []byte) {
@@ -25,6 +28,7 @@ func (c *Client) SendMessage(message []byte) {
 }
 
 func (c *Client) Deregister() {
+	c.dead = true
 	c.hub.unregister <- c
 	_ = c.conn.Close()
 }
@@ -86,6 +90,9 @@ func Broadcast(clients []*Client, message *Response) {
 		log.Fatalf("Error encoding base error response: %s", err)
 	}
 	for _, client := range clients {
+		if client.dead {
+			continue
+		}
 		go client.SendMessage(response)
 	}
 }
