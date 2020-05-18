@@ -33,7 +33,7 @@ func (s ChlorineRoomService) CreateRoom(token *storage.Token, config *storage.Ro
 			return nil, fmt.Errorf("chlorine: cannot create room: cannot save config: %s", err)
 		}
 	}
-	room := &storage.Room{SpotifyTokenID: storage.Reference(*token.ID), ConfigID: storage.Reference(*config.ID)}
+	room := &storage.Room{SpotifyTokenID: *token.ID, ConfigID: *config.ID}
 	err := s.Repository.SaveRoom(room)
 	if err != nil {
 		return nil, fmt.Errorf("chlorine: cannot create room: %s", err)
@@ -42,7 +42,7 @@ func (s ChlorineRoomService) CreateRoom(token *storage.Token, config *storage.Ro
 }
 
 func (s ChlorineRoomService) GetRoom(roomID int) (*storage.Room, error) {
-	return s.Repository.GetRoom(storage.ID(roomID))
+	return s.Repository.GetRoom(roomID)
 }
 
 func (s ChlorineRoomService) GetRoomConfig(roomID int) (*storage.RoomConfig, error) {

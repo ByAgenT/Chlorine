@@ -138,7 +138,7 @@ function useSpotifyPlaylist() {
           name: spotifySongs[index].name,
           artists: spotifySongs[index].artists,
           album: spotifySongs[index].album,
-          durationMs: spotifySongs[index].durationMs
+          durationMs: spotifySongs[index].durationMs,
         };
       });
       setPlaylist(fullPlaylist);
@@ -198,4 +198,10 @@ function useSpotifyPlaylist() {
   };
 }
 
-export { useSpotifyPlayer, useSpotifyPlaylist, usePlaybackInformation, SimplePlaybackInformation, PlaylistTrack };
+export {
+  useSpotifyPlayer,
+  useSpotifyPlaylist,
+  usePlaybackInformation,
+  SimplePlaybackInformation,
+  PlaylistTrack,
+};

@@ -31,7 +31,7 @@ func (h RoomHandler) Get(w http.ResponseWriter, r *http.Request) {
 		jsonWriter.Error(apierror.APIErrorUnauthorized, http.StatusUnauthorized)
 		return
 	}
-	room, err := h.RoomService.GetRoom(int(member.RoomID))
+	room, err := h.RoomService.GetRoom(member.RoomID)
 	if err != nil {
 		log.Printf("server: RoomHandler: %s", err.Error())
 		jsonWriter.Error(apierror.APIServerError, 500)
@@ -56,7 +56,7 @@ func (h RoomMembersHandler) Get(w http.ResponseWriter, r *http.Request) {
 		jsonWriter.Error(apierror.APIErrorUnauthorized, http.StatusUnauthorized)
 		return
 	}
-	room, err := h.RoomService.GetRoom(int(member.RoomID))
+	room, err := h.RoomService.GetRoom(member.RoomID)
 	if err != nil {
 		log.Printf("server: RoomMemberHandler: %s", err.Error())
 		jsonWriter.Error(apierror.APIServerError, 500)
@@ -88,7 +88,7 @@ func (h RoomSongsHandler) Get(w http.ResponseWriter, r *http.Request) {
 		jsonWriter.Error(apierror.APIErrorUnauthorized, http.StatusUnauthorized)
 		return
 	}
-	songs, err := h.SongService.GetRoomSongs(int(member.RoomID))
+	songs, err := h.SongService.GetRoomSongs(member.RoomID)
 	if err != nil {
 		log.Printf("server: RoomSongsHandler: %s", err)
 		jsonWriter.Error(apierror.APIServerError, http.StatusInternalServerError)
@@ -105,7 +105,7 @@ func (h RoomSongsHandler) Post(w http.ResponseWriter, r *http.Request) {
 		jsonWriter.Error(apierror.APIErrorUnauthorized, http.StatusUnauthorized)
 		return
 	}
-	room, err := h.RoomService.GetRoom(int(member.RoomID))
+	room, err := h.RoomService.GetRoom(member.RoomID)
 	if err != nil {
 		log.Printf("server: RoomSongsHandler: %s", err.Error())
 		jsonWriter.Error(apierror.APIServerError, 500)
@@ -120,8 +120,8 @@ func (h RoomSongsHandler) Post(w http.ResponseWriter, r *http.Request) {
 	}
 	songData := &struct {
 		SpotifyID      string `json:"spotify_id,omitempty"`
-		PreviousSongID int    `json:"previous_song_id,omitempty"`
-		NextSongID     int    `json:"next_song_id,omitempty"`
+		PreviousSongID *int   `json:"previous_song_id,omitempty"`
+		NextSongID     *int   `json:"next_song_id,omitempty"`
 	}{}
 	err = json.Unmarshal(body, &songData)
 	if err != nil {
@@ -131,10 +131,10 @@ func (h RoomSongsHandler) Post(w http.ResponseWriter, r *http.Request) {
 	}
 	song, err := h.SongService.CreateSong(cl.RawSong{
 		SpotifyID:      songData.SpotifyID,
-		RoomID:         int(*room.ID),
+		RoomID:         *room.ID,
 		PreviousSongID: songData.PreviousSongID,
 		NextSongID:     songData.NextSongID,
-		MemberCreated:  member,
+		MemberCreated:  *member.ID,
 	})
 	if err != nil {
 		log.Printf("server: RoomSongsHandler: cannot create song: %s", err)
@@ -142,7 +142,7 @@ func (h RoomSongsHandler) Post(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	jsonWriter.WriteJSONObject(song)
-	ws.Broadcast(roomWSConnections[int(member.RoomID)], &ws.Response{
+	ws.Broadcast(roomWSConnections[member.RoomID], &ws.Response{
 		Type:        ws.TypeBroadcast,
 		Status:      ws.StatusOK,
 		Description: "SongAdded",
@@ -160,7 +160,7 @@ func (h RoomSongsHandler) Put(w http.ResponseWriter, r *http.Request) {
 		jsonWriter.Error(apierror.APIErrorUnauthorized, http.StatusUnauthorized)
 		return
 	}
-	room, err := h.RoomService.GetRoom(int(member.RoomID))
+	room, err := h.RoomService.GetRoom(member.RoomID)
 	if err != nil {
 		log.Printf("server: RoomSongsHandler: %s", err.Error())
 		jsonWriter.Error(apierror.APIServerError, 500)
@@ -176,8 +176,8 @@ func (h RoomSongsHandler) Put(w http.ResponseWriter, r *http.Request) {
 	songData := &struct {
 		ID             int    `json:"id,omitempty"`
 		SpotifyID      string `json:"spotify_id,omitempty"`
-		PreviousSongID int    `json:"previous_song_id,omitempty"`
-		NextSongID     int    `json:"next_song_id,omitempty"`
+		PreviousSongID *int   `json:"previous_song_id,omitempty"`
+		NextSongID     *int   `json:"next_song_id,omitempty"`
 	}{}
 	err = json.Unmarshal(body, &songData)
 	if err != nil {
@@ -187,10 +187,10 @@ func (h RoomSongsHandler) Put(w http.ResponseWriter, r *http.Request) {
 	}
 	song, err := h.SongService.UpdateSong(songData.ID, cl.RawSong{
 		SpotifyID:      songData.SpotifyID,
-		RoomID:         int(*room.ID),
+		RoomID:         *room.ID,
 		PreviousSongID: songData.PreviousSongID,
 		NextSongID:     songData.NextSongID,
-		MemberCreated:  member,
+		MemberCreated:  *member.ID,
 	})
 	if err != nil {
 		log.Printf("server: RoomSongsHandler: cannot create song: %s", err)

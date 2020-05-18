@@ -13,23 +13,23 @@ const (
 // Member is a struct representation of a Chlorine member object.
 type Member struct {
 	Model
-	ID          *ID       `json:"id"`
+	ID          *int      `json:"id"`
 	Name        string    `json:"name"`
-	RoomID      Reference `json:"room_id"`
-	Role        Reference `json:"role"`
+	RoomID      int       `json:"room_id"`
+	Role        int       `json:"role"`
 	CreatedDate time.Time `json:"created_date"`
 }
 
 // MemberRole is a struct representation of a member role.
 type MemberRole struct {
-	ID      *ID    `json:"id,omitempty"`
+	ID      *int   `json:"id,omitempty"`
 	Name    string `json:"name,omitempty"`
 	IsAdmin bool   `json:"is_admin,omitempty"`
 }
 
 type MemberRepository interface {
 	SaveMember(member *Member) error
-	GetMember(memberID ID) (*Member, error)
+	GetMember(memberID int) (*Member, error)
 	GetMemberRole(member *Member) (*MemberRole, error)
 }
 
@@ -52,7 +52,7 @@ func (m PGMemberRepository) GetMemberRole(member *Member) (*MemberRole, error) {
 // or performs update of an entry with the given ID in the Member object.
 func (m PGMemberRepository) SaveMember(member *Member) error {
 	if member.ID == nil {
-		var id ID
+		var id int
 		member.CreatedDate = time.Now().UTC()
 		err := m.Storage.QueryRow("INSERT INTO member (name, room_id, role) VALUES ($1, $2, $3) RETURNING id",
 			member.Name, member.RoomID, member.Role).Scan(&id)
@@ -71,7 +71,7 @@ func (m PGMemberRepository) SaveMember(member *Member) error {
 }
 
 // GetMember return specific member object by it's ID.
-func (m PGMemberRepository) GetMember(memberID ID) (*Member, error) {
+func (m PGMemberRepository) GetMember(memberID int) (*Member, error) {
 	member := &Member{}
 	err := m.Storage.QueryRow("SELECT id, name, room_id, role, created_date FROM member WHERE id = $1", memberID).Scan(
 		&member.ID, &member.Name, &member.RoomID, &member.Role, &member.CreatedDate)

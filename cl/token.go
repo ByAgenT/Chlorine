@@ -23,7 +23,7 @@ type ChlorineTokenService struct {
 }
 
 func (s ChlorineTokenService) GetToken(id int) (*storage.Token, error) {
-	return s.Repository.GetToken(storage.ID(id))
+	return s.Repository.GetToken(id)
 }
 
 func (s ChlorineTokenService) SaveToken(token RawToken) error {
@@ -37,5 +37,5 @@ func (s ChlorineTokenService) SaveToken(token RawToken) error {
 }
 
 func (s ChlorineTokenService) GetRoomToken(roomID int) (*storage.Token, error) {
-	return s.Repository.GetRoomToken(storage.ID(roomID))
+	return s.Repository.GetRoomToken(roomID)
 }

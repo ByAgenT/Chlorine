@@ -6,9 +6,9 @@ import "time"
 // own configuration and have Spotify token from owner to allow control music.
 type Room struct {
 	Model
-	ID             *ID       `json:"id,omitempty"`
-	SpotifyTokenID Reference `json:"spotify_token,omitempty"`
-	ConfigID       Reference `json:"config_id,omitempty"`
+	ID             *int      `json:"id,omitempty"`
+	SpotifyTokenID int       `json:"spotify_token,omitempty"`
+	ConfigID       int       `json:"config_id,omitempty"`
 	CreatedDate    time.Time `json:"created_date,omitempty"`
 }
 
@@ -16,7 +16,7 @@ type Room struct {
 // party room.
 type RoomConfig struct {
 	Model
-	ID             *ID       `json:"id,omitempty"`
+	ID             *int      `json:"id,omitempty"`
 	SongsPerMember int       `json:"songs_per_member,omitempty"`
 	MaxMembers     int       `json:"max_members,omitempty"`
 	CreatedDate    time.Time `json:"created_date,omitempty"`
@@ -24,7 +24,7 @@ type RoomConfig struct {
 
 type RoomRepository interface {
 	GetRooms() ([]Room, error)
-	GetRoom(roomID ID) (*Room, error)
+	GetRoom(roomID int) (*Room, error)
 	SaveRoom(room *Room) error
 	SaveRoomConfig(rc *RoomConfig) error
 }
@@ -54,7 +54,7 @@ func (r PGRoomRepository) GetRooms() ([]Room, error) {
 	return rooms, nil
 }
 
-func (r PGRoomRepository) GetRoom(roomID ID) (*Room, error) {
+func (r PGRoomRepository) GetRoom(roomID int) (*Room, error) {
 	room := &Room{}
 	err := r.Storage.QueryRow("SELECT id, spotify_token, config_id, created_date FROM room WHERE id = $1", roomID).Scan(
 		&room.ID, &room.SpotifyTokenID, &room.ConfigID, &room.CreatedDate)
@@ -67,7 +67,7 @@ func (r PGRoomRepository) GetRoom(roomID ID) (*Room, error) {
 
 func (r PGRoomRepository) SaveRoom(room *Room) error {
 	if room.ID == nil {
-		var id ID
+		var id int
 		room.CreatedDate = time.Now().UTC()
 		err := r.Storage.QueryRow(
 			"INSERT INTO room (config_id, spotify_token, created_date) VALUES ($1, $2, $3) RETURNING id",
@@ -87,7 +87,7 @@ func (r PGRoomRepository) SaveRoom(room *Room) error {
 
 func (r PGRoomRepository) SaveRoomConfig(rc *RoomConfig) error {
 	if rc.ID == nil {
-		var id ID
+		var id int
 		rc.CreatedDate = time.Now().UTC()
 		err := r.Storage.QueryRow(
 			"INSERT INTO room_config (songs_per_member, max_members, created_date) VALUES ($1, $2, $3) RETURNING id",

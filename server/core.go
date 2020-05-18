@@ -48,5 +48,4 @@ func panicIfErr(jsonWriter JSONResponseWriter, err error, pretext string) {
 func init() {
 	gob.Register(&time.Time{})
 	gob.Register(&time.Location{})
-	gob.Register(storage.ID(0))
 }

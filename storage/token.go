@@ -7,7 +7,7 @@ import (
 
 // Token structure contains OAuth 2.0 token information.
 type Token struct {
-	ID           *ID       `json:"id,omitempty"`
+	ID           *int      `json:"id,omitempty"`
 	AccessToken  string    `json:"access_token,omitempty"`
 	Expiry       time.Time `json:"expiry,omitempty"`
 	RefreshToken string    `json:"refresh_token,omitempty"`
@@ -16,9 +16,9 @@ type Token struct {
 
 // TokenRepository represents interface for data access to Token object.
 type TokenRepository interface {
-	GetToken(id ID) (*Token, error)
+	GetToken(id int) (*Token, error)
 	SaveToken(token *Token) error
-	GetRoomToken(roomID ID) (*Token, error)
+	GetRoomToken(roomID int) (*Token, error)
 }
 
 // OAuthConvertible represents objects that could be converted to the OAuth2 token

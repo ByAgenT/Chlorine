@@ -36,8 +36,8 @@ const PlayerPage: React.FC<PlayerPageProps> = ({ member }) => {
     doShuffle,
   } = useSpotifyPlaylist();
 
-  const updatePlaylist = useCallback(() => {
-    return fetchTracks();
+  const updatePlaylist = useCallback(async () => {
+    await fetchTracks();
   }, [fetchTracks]);
 
   const claimPlayback = useCallback(() => {
@@ -70,6 +70,9 @@ const PlayerPage: React.FC<PlayerPageProps> = ({ member }) => {
     });
     webSocketConnection.onBroadcast('MemberAdded', () => {
       updateMembers();
+    });
+    webSocketConnection.onBroadcast('SongDeleted', () => {
+      updatePlaylist();
     });
 
     return () => {
