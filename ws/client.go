@@ -91,6 +91,7 @@ func Broadcast(clients []*Client, message *Response) {
 	}
 	for _, client := range clients {
 		if client.dead {
+			// TODO: implement cleaning of a dead connections in map
 			continue
 		}
 		go client.SendMessage(response)

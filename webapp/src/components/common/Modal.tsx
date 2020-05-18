@@ -46,9 +46,9 @@ const ModalContainer = styled.div<ModalContainerProps>`
 const ModalContent = styled.div`
   background-color: #222326;
   color: white;
-  margin: 5% auto; /* 15% from the top and centered */
+  margin: 5% auto; /* 5% from the top and centered */
   border: 1px solid #888;
-  width: 40%; /* Could be more or less, depending on screen size */
+  width: 40rem; /* Could be more or less, depending on screen size */
   & > ${LinkButton} {
     margin: 0;
     padding-top: 0.5em;

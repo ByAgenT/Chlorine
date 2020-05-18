@@ -76,9 +76,11 @@ const SettingsContainer = styled.div`
   border-left: 1px dashed #616467;
   width: 20rem;
   align-items: center;
+  justify-content: center;
 
   & > * {
-    padding-top: 1.5rem;
+    padding-top: 0.85rem;
+    padding-bottom: 0.75rem;
   }
 `;
 

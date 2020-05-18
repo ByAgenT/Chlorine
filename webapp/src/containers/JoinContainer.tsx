@@ -12,20 +12,11 @@ const JoinOuterContainer = styled.div`
   display: flex;
   min-height: 35rem;
   justify-content: center;
-
-  ${down('tablet')} {
-    flex-direction: column;
-  }
-
-  ${up('desktop')} {
-    flex-direction: 'row';
-    margin: 10px;
-  }
+  width: max-content;
+  margin: 1.5rem auto;
 `;
 
 const JoinInnerContainer = styled.div`
-  min-height: 35rem;
-
   ${up('desktop')} {
     min-width: 35rem;
   }
