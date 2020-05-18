@@ -177,7 +177,7 @@ class ChlorineResponseMapper {
     };
   }
 
-  public async mapSong(songResponse: {
+  public mapSong(songResponse: {
     id: number;
     spotify_id: string;
     room_id: number;
@@ -185,7 +185,7 @@ class ChlorineResponseMapper {
     next_song_id: number | null;
     member_added_id: number;
     created_date: string;
-  }): Promise<Song> {
+  }): Song {
     return {
       nextSongId: songResponse.next_song_id,
       previousSongId: songResponse.previous_song_id,

@@ -3,16 +3,16 @@ import styled from 'styled-components';
 import LinkButton from './common/LinkButton';
 import TrackListItem from './TrackListItem';
 import List from './common/List';
-import { SpotifyTrack } from '../models/chlorine';
 import { useTranslation } from 'react-i18next';
-import { toTrackTime } from '../utils/time';
+import { PlaylistTrack } from '../hooks/player';
 
 interface SpotifyPlaylistProps {
   onAddSongClick: (event: React.MouseEvent) => void;
   onStartPlay?: (event: React.MouseEvent) => void;
   onShuffle?: (event: React.MouseEvent) => void;
+  onDelete?: (track: PlaylistTrack) => void;
   onUpdate: (event: React.MouseEvent) => void;
-  playlist: SpotifyTrack[];
+  playlist: PlaylistTrack[];
 }
 
 const SpotifyPlaylist: React.FC<SpotifyPlaylistProps> = ({
@@ -20,28 +20,17 @@ const SpotifyPlaylist: React.FC<SpotifyPlaylistProps> = ({
   playlist,
   onStartPlay,
   onShuffle,
+  onDelete,
   onUpdate,
 }) => {
   const { t } = useTranslation();
   return (
     <SpotifyPlaylistContainer>
       <PlaylistList>
-        {playlist
-          ? playlist.map((track) => {
-              return (
-                <TrackListItem
-                  key={track.id}
-                  title={track.name}
-                  artist={track.artists.map((artist) => artist.name).join(', ')}
-                  img={
-                    track.album.images.filter((image) => image.width > 50 && image.width < 100)[0]
-                      .url
-                  }
-                  duration={toTrackTime(track.durationMs)}
-                />
-              );
-            })
-          : ''}
+        {playlist &&
+          playlist.map((track) => {
+            return <TrackListItem key={track.id} track={track} onDelete={onDelete} />;
+          })}
       </PlaylistList>
       <PlaylistBottomBar>
         <LinkButton onClick={onAddSongClick}>{t('add_songs')}</LinkButton>

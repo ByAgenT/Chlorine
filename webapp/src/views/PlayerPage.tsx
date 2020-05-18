@@ -4,7 +4,7 @@ import * as React from 'react';
 import { useCallback, useEffect, useState } from 'react';
 import PartyContainer from '../containers/PartyContainer';
 import Panel from '../components/common/Panel';
-import { usePlaybackInformation, useSpotifyPlayer, useSpotifyPlaylist } from '../hooks/player';
+import { PlaylistTrack, usePlaybackInformation, useSpotifyPlayer, useSpotifyPlaylist } from '../hooks/player';
 import { useMembersList } from '../hooks/membership';
 import { ChlorineService } from '../services/chlorineService';
 import MembersList from '../components/MembersList';
@@ -29,17 +29,16 @@ const PlayerPage: React.FC<PlayerPageProps> = ({ member }) => {
   const [isModalShowed, setModalShowed] = useState<boolean>(false);
   const webSocketConnection = useChlorineWebSocket();
   const {
-    spotifyTrackInfo,
-    fetchPlaylist,
-    fetchSpotifyTrackInfo,
+    playlist,
+    fetchTracks,
     appendSong,
     startPlay,
     doShuffle,
   } = useSpotifyPlaylist();
 
-  const updatePlaylist = useCallback(() => {
-    return Promise.all([fetchPlaylist(), fetchSpotifyTrackInfo()]);
-  }, [fetchPlaylist, fetchSpotifyTrackInfo]);
+  const updatePlaylist = useCallback(async () => {
+    await fetchTracks();
+  }, [fetchTracks]);
 
   const claimPlayback = useCallback(() => {
     if (player) {
@@ -58,6 +57,11 @@ const PlayerPage: React.FC<PlayerPageProps> = ({ member }) => {
     }
   }, [player]);
 
+  const trackDelete = useCallback(async (track: PlaylistTrack) => {
+    await new ChlorineService().deleteSong(track.id);
+    await fetchTracks();
+  }, [fetchTracks]);
+
   useEffect(claimPlayback);
 
   useEffect(() => {
@@ -66,6 +70,9 @@ const PlayerPage: React.FC<PlayerPageProps> = ({ member }) => {
     });
     webSocketConnection.onBroadcast('MemberAdded', () => {
       updateMembers();
+    });
+    webSocketConnection.onBroadcast('SongDeleted', () => {
+      updatePlaylist();
     });
 
     return () => {
@@ -83,8 +90,9 @@ const PlayerPage: React.FC<PlayerPageProps> = ({ member }) => {
             onAddSongClick={() => setModalShowed(!isModalShowed)}
             onStartPlay={startPlay}
             onShuffle={doShuffle}
-            playlist={spotifyTrackInfo}
+            playlist={playlist}
             onUpdate={updatePlaylist}
+            onDelete={trackDelete}
           />
         </Panel>
       </PartyContainer>

@@ -17,15 +17,14 @@ const PartyPage: React.FC = () => {
   const [isModalShowed, setModalShowed] = useState<boolean>(false);
   const webSocketConnection = useChlorineWebSocket();
   const {
-    spotifyTrackInfo,
+    playlist,
     appendSong,
-    fetchPlaylist,
-    fetchSpotifyTrackInfo,
+    fetchTracks
   } = useSpotifyPlaylist();
 
   const updatePlaylist = useCallback(() => {
-    return Promise.all([fetchPlaylist(), fetchSpotifyTrackInfo()]);
-  }, [fetchPlaylist, fetchSpotifyTrackInfo]);
+    return fetchTracks();
+  }, [fetchTracks]);
 
   useEffect(() => {
     webSocketConnection.onBroadcast('SongAdded', () => {
@@ -39,7 +38,7 @@ const PartyPage: React.FC = () => {
         <Panel name={t('playlist')}>
           <SpotifyPlaylist
             onAddSongClick={() => setModalShowed(!isModalShowed)}
-            playlist={spotifyTrackInfo}
+            playlist={playlist}
             onUpdate={updatePlaylist}
           />
         </Panel>

@@ -9,14 +9,15 @@ import (
 type RawSong struct {
 	SpotifyID      string
 	RoomID         int
-	PreviousSongID int
-	NextSongID     int
-	MemberCreated  *storage.Member
+	PreviousSongID *int
+	NextSongID     *int
+	MemberCreated  int
 }
 
 type SongService interface {
 	CreateSong(songData RawSong) (*storage.Song, error)
 	UpdateSong(id int, songData RawSong) (*storage.Song, error)
+	GetSong(id int) (*storage.Song, error)
 	GetRoomSongs(roomID int) ([]storage.Song, error)
 	DeleteSong(id int) error
 }
@@ -26,7 +27,47 @@ type ChlorineSongService struct {
 }
 
 func (s ChlorineSongService) DeleteSong(id int) error {
+	song, err := s.GetSong(id)
+	if err != nil {
+		return err
+	}
+	if song.NextSongID != nil {
+		nextSong, err := s.GetSong(*song.NextSongID)
+		if err != nil {
+			return err
+		}
+		_, err = s.UpdateSong(*nextSong.ID, RawSong{
+			SpotifyID:      nextSong.SpotifyID,
+			RoomID:         nextSong.RoomID,
+			PreviousSongID: song.PreviousSongID,
+			NextSongID:     nextSong.NextSongID,
+			MemberCreated:  nextSong.MemberAddedID,
+		})
+		if err != nil {
+			return err
+		}
+	}
+	if song.PreviousSongID != nil {
+		prevSong, err := s.GetSong(*song.PreviousSongID)
+		if err != nil {
+			return err
+		}
+		_, err = s.UpdateSong(*prevSong.ID, RawSong{
+			SpotifyID:      prevSong.SpotifyID,
+			RoomID:         prevSong.RoomID,
+			PreviousSongID: prevSong.PreviousSongID,
+			NextSongID:     song.NextSongID,
+			MemberCreated:  prevSong.MemberAddedID,
+		})
+		if err != nil {
+			return err
+		}
+	}
 	return s.Repository.DeleteSong(id)
+}
+
+func (s ChlorineSongService) GetSong(id int) (*storage.Song, error) {
+	return s.Repository.GetSong(id)
 }
 
 // GetRoomSongs return all songs that belongs to the provided room ID.
@@ -36,18 +77,9 @@ func (s ChlorineSongService) GetRoomSongs(roomID int) ([]storage.Song, error) {
 
 // CreateSong creates a new song from the RawSong data and return Song instance written to the database.
 func (s ChlorineSongService) CreateSong(songData RawSong) (*storage.Song, error) {
-	var prevSong, nextSong *storage.Reference
-	if songData.PreviousSongID != 0 {
-		ref := storage.Reference(songData.PreviousSongID)
-		prevSong = &ref
-	}
-	if songData.NextSongID != 0 {
-		ref := storage.Reference(songData.NextSongID)
-		nextSong = &ref
-	}
-	song := &storage.Song{SpotifyID: songData.SpotifyID, RoomID: storage.Reference(songData.RoomID),
-		PreviousSongID: prevSong, NextSongID: nextSong,
-		MemberAddedID: storage.Reference(*songData.MemberCreated.ID)}
+	song := &storage.Song{SpotifyID: songData.SpotifyID, RoomID: songData.RoomID,
+		PreviousSongID: songData.PreviousSongID, NextSongID: songData.NextSongID,
+		MemberAddedID: songData.MemberCreated}
 	err := s.Repository.SaveSong(song)
 	if err != nil {
 		return nil, fmt.Errorf("chlorine: cannot create song: %s", err)
@@ -57,19 +89,10 @@ func (s ChlorineSongService) CreateSong(songData RawSong) (*storage.Song, error)
 
 // UpdateSong updates song by it's ID with the values provided in RawSong.
 func (s ChlorineSongService) UpdateSong(id int, songData RawSong) (*storage.Song, error) {
-	var prevSong, nextSong *storage.Reference
-	identifier := storage.ID(id)
-	if songData.PreviousSongID != 0 {
-		ref := storage.Reference(songData.PreviousSongID)
-		prevSong = &ref
-	}
-	if songData.NextSongID != 0 {
-		ref := storage.Reference(songData.NextSongID)
-		nextSong = &ref
-	}
-	song := &storage.Song{ID: &identifier, SpotifyID: songData.SpotifyID, RoomID: storage.Reference(songData.RoomID),
-		PreviousSongID: prevSong, NextSongID: nextSong,
-		MemberAddedID: storage.Reference(*songData.MemberCreated.ID)}
+	identifier := id
+	song := &storage.Song{ID: &identifier, SpotifyID: songData.SpotifyID, RoomID: songData.RoomID,
+		PreviousSongID: songData.PreviousSongID, NextSongID: songData.NextSongID,
+		MemberAddedID: songData.MemberCreated}
 	err := s.Repository.SaveSong(song)
 	if err != nil {
 		return nil, fmt.Errorf("chlorine: cannot create song: %s", err)

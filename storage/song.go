@@ -8,17 +8,18 @@ import (
 // Song is a struct representation of a Spotify song within Chlorine.
 type Song struct {
 	Model
-	ID             *ID        `json:"id"`
-	SpotifyID      string     `json:"spotify_id"`
-	RoomID         Reference  `json:"room_id"`
-	PreviousSongID *Reference `json:"previous_song_id"`
-	NextSongID     *Reference `json:"next_song_id"`
-	MemberAddedID  Reference  `json:"member_added_id"`
-	CreatedDate    time.Time  `json:"created_date"`
+	ID             *int      `json:"id"`
+	SpotifyID      string    `json:"spotify_id"`
+	RoomID         int       `json:"room_id"`
+	PreviousSongID *int      `json:"previous_song_id"`
+	NextSongID     *int      `json:"next_song_id"`
+	MemberAddedID  int       `json:"member_added_id"`
+	CreatedDate    time.Time `json:"created_date"`
 }
 
 type SongRepository interface {
 	GetRoomSongs(roomID int) ([]Song, error)
+	GetSong(songID int) (*Song, error)
 	SaveSong(song *Song) error
 	DeleteSong(songID int) error
 }
@@ -31,6 +32,16 @@ func (s PGSongRepository) DeleteSong(songID int) error {
 	query := "DELETE FROM song WHERE id = $1"
 	_, err := s.Storage.Exec(query, songID)
 	return err
+}
+
+func (s PGSongRepository) GetSong(songID int) (*Song, error) {
+	song := &Song{}
+	err := s.Storage.QueryRow("SELECT id, spotify_id, room_id, prev_song_id, next_song_id, member_added_id FROM song WHERE id = $1", songID).Scan(
+		&song.ID, &song.SpotifyID, &song.RoomID, &song.PreviousSongID, &song.NextSongID, &song.MemberAddedID)
+	if err != nil {
+		return nil, err
+	}
+	return song, nil
 }
 
 func (s PGSongRepository) GetRoomSongs(roomID int) ([]Song, error) {
@@ -58,8 +69,7 @@ func (s PGSongRepository) GetRoomSongs(roomID int) ([]Song, error) {
 
 func (s PGSongRepository) SaveSong(song *Song) error {
 	if song.ID == nil {
-		var id ID
-
+		var id int
 		song.CreatedDate = time.Now().UTC()
 		var err error
 		err = s.Storage.QueryRow("INSERT INTO song (spotify_id, room_id, prev_song_id, next_song_id, member_added_id) VALUES ($1, $2, $3, $4, $5) RETURNING id",

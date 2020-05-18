@@ -8,7 +8,7 @@ type PGTokenRepository struct {
 	Storage *DBStorage
 }
 
-func (r PGTokenRepository) GetToken(id ID) (*Token, error) {
+func (r PGTokenRepository) GetToken(id int) (*Token, error) {
 	token := new(Token)
 	err := r.Storage.QueryRow("SELECT id, access_token, expiry, refresh_token, token_type FROM room WHERE id = $1", id).Scan(
 		&token.ID, &token.AccessToken, &token.Expiry, &token.RefreshToken, &token.TokenType)
@@ -20,7 +20,7 @@ func (r PGTokenRepository) GetToken(id ID) (*Token, error) {
 
 func (r PGTokenRepository) SaveToken(token *Token) error {
 	if token.ID == nil {
-		var id ID
+		var id int
 		err := r.Storage.QueryRow(
 			"INSERT INTO spotify_token (access_token, expiry, refresh_token, token_type) VALUES ($1, $2, $3, $4) RETURNING id",
 			token.AccessToken, token.Expiry, token.RefreshToken, token.TokenType).Scan(&id)
@@ -38,7 +38,7 @@ func (r PGTokenRepository) SaveToken(token *Token) error {
 	return nil
 }
 
-func (r PGTokenRepository) GetRoomToken(roomID ID) (*Token, error) {
+func (r PGTokenRepository) GetRoomToken(roomID int) (*Token, error) {
 	token := new(Token)
 	err := r.Storage.QueryRow("SELECT spotify_token.id, spotify_token.access_token, spotify_token.expiry, spotify_token.refresh_token, spotify_token.token_type FROM room INNER JOIN spotify_token ON room.spotify_token = spotify_token.id WHERE room.id = $1", roomID).Scan(
 		&token.ID, &token.AccessToken, &token.Expiry, &token.RefreshToken, &token.TokenType)

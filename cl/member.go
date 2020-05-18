@@ -26,8 +26,8 @@ type ChlorineMemberService struct {
 func (m ChlorineMemberService) CreateMember(rawMember RawMember) (*storage.Member, error) {
 	member := &storage.Member{
 		Name:   rawMember.Name,
-		RoomID: storage.Reference(rawMember.RoomID),
-		Role:   storage.Reference(rawMember.Role)}
+		RoomID: rawMember.RoomID,
+		Role:   rawMember.Role}
 	err := m.Repository.SaveMember(member)
 	if err != nil {
 		return nil, err
@@ -36,22 +36,22 @@ func (m ChlorineMemberService) CreateMember(rawMember RawMember) (*storage.Membe
 }
 
 func (m ChlorineMemberService) UpdateMember(memberID int, member RawMember) error {
-	memberStorageID := storage.ID(memberID)
+	memberStorageID := memberID
 	memberToUpdate := &storage.Member{
 		ID:     &memberStorageID,
 		Name:   member.Name,
-		RoomID: storage.Reference(member.RoomID),
-		Role:   storage.Reference(member.Role),
+		RoomID: member.RoomID,
+		Role:   member.Role,
 	}
 	return m.Repository.SaveMember(memberToUpdate)
 }
 
 func (m ChlorineMemberService) GetMember(memberID int) (*storage.Member, error) {
-	return m.Repository.GetMember(storage.ID(memberID))
+	return m.Repository.GetMember(memberID)
 }
 
 func (m ChlorineMemberService) GetMemberRole(memberID int) (*storage.MemberRole, error) {
-	member, err := m.Repository.GetMember(storage.ID(memberID))
+	member, err := m.Repository.GetMember(memberID)
 	if err != nil {
 		return nil, err
 	}
