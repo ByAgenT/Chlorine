@@ -1,8 +1,6 @@
-import debounce from 'lodash/debounce';
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { withRouter } from 'react-router-dom';
 import { useMembersList } from '../hooks/membership';
-import { useSongSearch } from '../hooks/search';
 import { useSpotifyPlaylist } from '../hooks/player';
 import RootPartyContainer from '../containers/RootPartyContainer';
 import PartyContainer from '../containers/PartyContainer';
@@ -11,12 +9,13 @@ import SpotifyPlaylist from '../components/SpotifyPlaylist';
 import MembersList from '../components/MembersList';
 import { useTranslation } from 'react-i18next';
 import AddSongsModal from '../containers/AddSongsModal';
+import useChlorineWebSocket from '../hooks/websocket';
 
 const PartyPage: React.FC = () => {
   const { t } = useTranslation();
   const [members, updateMembers] = useMembersList();
   const [isModalShowed, setModalShowed] = useState<boolean>(false);
-  const { searchResult, setSongQuery } = useSongSearch();
+  const webSocketConnection = useChlorineWebSocket();
   const {
     spotifyTrackInfo,
     appendSong,
@@ -24,18 +23,15 @@ const PartyPage: React.FC = () => {
     fetchSpotifyTrackInfo,
   } = useSpotifyPlaylist();
 
-  const updateSongQuery = debounce((event: React.ChangeEvent<HTMLTextAreaElement>): void => {
-    setSongQuery(event.target.value);
-  }, 200);
+  const updatePlaylist = useCallback(() => {
+    return Promise.all([fetchPlaylist(), fetchSpotifyTrackInfo()]);
+  }, [fetchPlaylist, fetchSpotifyTrackInfo]);
 
-  function onSearchModalChange(event: React.ChangeEvent<HTMLTextAreaElement>): void {
-    event.persist();
-    updateSongQuery(event);
-  }
-
-  function updatePlaylist(): void {
-    Promise.all([fetchPlaylist(), fetchSpotifyTrackInfo()]);
-  }
+  useEffect(() => {
+    webSocketConnection.onBroadcast('SongAdded', () => {
+      updatePlaylist();
+    });
+  }, [webSocketConnection, updatePlaylist]);
 
   return (
     <RootPartyContainer>
@@ -53,13 +49,7 @@ const PartyPage: React.FC = () => {
           <MembersList members={members} onUpdate={updateMembers} />
         </Panel>
       </PartyContainer>
-      <AddSongsModal
-        isShowed={isModalShowed}
-        onClose={setModalShowed}
-        onSearchValueChange={onSearchModalChange}
-        onSongAdd={appendSong}
-        songs={searchResult}
-      />
+      <AddSongsModal isShowed={isModalShowed} onClose={setModalShowed} onSongAdd={appendSong} />
     </RootPartyContainer>
   );
 };

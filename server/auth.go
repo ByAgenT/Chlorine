@@ -35,7 +35,7 @@ func (h LoginHandler) Get(w http.ResponseWriter, r *http.Request) {
 	session := h.InitSession(r)
 	jsonWriter := JSONResponseWriter{w}
 
-	authURL := auth.InitializeLogin(context.Background(), session)
+	authURL := auth.InitializeLogin(context.Background(), session, auth.GetAuthCallback(r))
 	err := session.Save(r, w)
 	panicIfErr(jsonWriter, err, "unable to save session")
 	http.Redirect(w, r, authURL, http.StatusFound)

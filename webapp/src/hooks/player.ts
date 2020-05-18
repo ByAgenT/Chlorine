@@ -121,7 +121,7 @@ function useSpotifyPlaylist() {
     } catch (error) {
       console.error(error);
     }
-  }, []);
+  }, [setPlaylist]);
 
   const fetchSpotifyTrackInfo = useCallback(async function () {
     try {
@@ -130,7 +130,7 @@ function useSpotifyPlaylist() {
     } catch (error) {
       console.error(error);
     }
-  }, []);
+  }, [setSpotifyTrackInfo]);
 
   // TODO: revisit and optimize
   async function appendSong(spotifyId: string): Promise<Song> {
