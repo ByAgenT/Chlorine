@@ -17,7 +17,8 @@ class ChlorineWebSocketConnection {
 
   public establishOnce() {
     if (!this.connection) {
-      this.connection = new WebSocket(`ws://${window.location.host}/ws`);
+      const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+      this.connection = new WebSocket(`${protocol}://${window.location.host}/ws`);
       this.connection.onerror = this.error.bind(this);
       this.connection.onmessage = this.listen.bind(this);
     }
