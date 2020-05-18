@@ -21,6 +21,15 @@ services:
     depends_on:
       - api
 
+  webserver-dev:
+    build:
+      context: ./webapp
+      dockerfile: Dockerfile-dev
+    ports:
+      - 80:80
+    depends_on:
+      - api
+
   api:
     build:
       context: .
