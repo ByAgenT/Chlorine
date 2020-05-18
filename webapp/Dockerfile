@@ -13,8 +13,3 @@ FROM nginx:1.17
 
 COPY --from=build-stage /webapp/dist/ /etc/nginx/html/
 COPY config/nginx.conf /etc/nginx/nginx.conf
-
-
-
-
-
