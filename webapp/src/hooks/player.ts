@@ -2,7 +2,16 @@ import { useCallback, useEffect, useState } from 'react';
 import { connectPlayer, SpotifyPlayer } from '../services/spotifyPlaybackService';
 import { ChlorineService } from '../services/chlorineService';
 import shuffle from 'lodash/shuffle';
-import { Song, SpotifyTrack, Token } from '../models/chlorine';
+import { Album, Artist, Song, SpotifyTrack, Token } from '../models/chlorine';
+
+interface PlaylistTrack {
+  id: number;
+  spotifyId: string;
+  name: string;
+  artists: Artist[];
+  album: Album;
+  durationMs: number;
+}
 
 interface SimplePlaybackInformation {
   now: number;
@@ -111,32 +120,38 @@ function usePlaybackInformation(player: SpotifyPlayer | null) {
 }
 
 function useSpotifyPlaylist() {
-  const [playlist, setPlaylist] = useState<Song[]>([]);
+  const [playlist, setPlaylist] = useState<PlaylistTrack[]>();
+  const [songPlaylist, setSongPlaylist] = useState<Song[]>([]);
   const [spotifyTrackInfo, setSpotifyTrackInfo] = useState<SpotifyTrack[]>([]);
 
-  const fetchPlaylist = useCallback(async function () {
+  const fetchTracks = useCallback(async () => {
     try {
-      const fetchedSongs = await new ChlorineService().retrieveRoomSongs();
-      setPlaylist(fetchedSongs);
+      const chlorineService = new ChlorineService();
+      const fetchedSongs = await chlorineService.retrieveRoomSongs();
+      setSongPlaylist(fetchedSongs);
+      const spotifySongs = await chlorineService.retrieveRoomsSongsFromSpotify();
+      setSpotifyTrackInfo(spotifySongs);
+      const fullPlaylist = fetchedSongs.map<PlaylistTrack>((song, index) => {
+        return {
+          id: song.id,
+          spotifyId: spotifySongs[index].id,
+          name: spotifySongs[index].name,
+          artists: spotifySongs[index].artists,
+          album: spotifySongs[index].album,
+          durationMs: spotifySongs[index].durationMs
+        };
+      });
+      setPlaylist(fullPlaylist);
     } catch (error) {
       console.error(error);
     }
-  }, [setPlaylist]);
-
-  const fetchSpotifyTrackInfo = useCallback(async function () {
-    try {
-      const fetchedInfo = await new ChlorineService().retrieveRoomsSongsFromSpotify();
-      setSpotifyTrackInfo(fetchedInfo);
-    } catch (error) {
-      console.error(error);
-    }
-  }, [setSpotifyTrackInfo]);
+  }, [setSongPlaylist, setSpotifyTrackInfo, setPlaylist]);
 
   // TODO: revisit and optimize
   async function appendSong(spotifyId: string): Promise<Song> {
     const chlorineService = new ChlorineService();
-    await Promise.all([fetchPlaylist(), fetchSpotifyTrackInfo()]);
-    const lastSong = playlist.filter((song) => song.nextSongId == null);
+    await fetchTracks();
+    const lastSong = songPlaylist.filter((song) => song.nextSongId == null);
     if (lastSong[0]) {
       try {
         const newSong = await chlorineService.addSong(spotifyId, lastSong[0].id, null);
@@ -145,7 +160,7 @@ function useSpotifyPlaylist() {
           prevSongId: lastSong[0].previousSongId,
           nextSongId: newSong.id,
         });
-        await Promise.all([fetchPlaylist(), fetchSpotifyTrackInfo()]);
+        await fetchTracks();
         return newSong;
       } catch (error) {
         console.error(error);
@@ -153,7 +168,7 @@ function useSpotifyPlaylist() {
       }
     }
     const song = await chlorineService.addSong(spotifyId, null, null);
-    await Promise.all([fetchPlaylist(), fetchSpotifyTrackInfo()]);
+    await fetchTracks();
     return song;
   }
 
@@ -166,22 +181,21 @@ function useSpotifyPlaylist() {
   }
 
   async function doShuffle() {
-    setSpotifyTrackInfo(shuffle(spotifyTrackInfo));
+    setPlaylist(shuffle(playlist));
   }
 
   useEffect(() => {
-    Promise.all([fetchPlaylist(), fetchSpotifyTrackInfo()]);
-  }, [fetchPlaylist, fetchSpotifyTrackInfo]);
+    fetchTracks();
+  }, [fetchTracks]);
 
   return {
     playlist,
     spotifyTrackInfo,
-    fetchPlaylist,
-    fetchSpotifyTrackInfo,
+    fetchTracks,
     appendSong,
     startPlay,
     doShuffle,
   };
 }
 
-export { useSpotifyPlayer, useSpotifyPlaylist, usePlaybackInformation, SimplePlaybackInformation };
+export { useSpotifyPlayer, useSpotifyPlaylist, usePlaybackInformation, SimplePlaybackInformation, PlaylistTrack };

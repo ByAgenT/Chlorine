@@ -2,30 +2,34 @@ import * as React from 'react';
 import styled from 'styled-components';
 import ListItem from './common/ListItem';
 import { AlignedCenterFlex } from '../containers/common/AlignedCenterFlex';
+import { PlaylistTrack } from '../hooks/player';
+import { toTrackTime } from '../utils/time';
 
 interface TrackListItemProps {
-  img: string;
-  title: string;
-  artist: string;
-  duration: string;
+  track: PlaylistTrack;
+  onDelete?: (track: PlaylistTrack) => void;
 }
 
-const TrackListItem: React.FC<TrackListItemProps> = ({ img, title, artist, duration }) => (
+const TrackListItem: React.FC<TrackListItemProps> = ({ track, onDelete }) => (
   <TrackListItemContainer>
     <AlignedCenterFlex>
-      <TrackImage src={img} />
+      <TrackImage
+        src={track.album.images.filter((image) => image.width > 50 && image.width < 100)[0].url}
+      />
       <TrackDescriptionContainer>
-        <TrackTitle>{title}</TrackTitle>
-        <TrackArtist>{artist}</TrackArtist>
+        <TrackTitle>{track.name}</TrackTitle>
+        <TrackArtist>{track.artists.map((artist) => artist.name).join(', ')}</TrackArtist>
       </TrackDescriptionContainer>
     </AlignedCenterFlex>
     <RightContainer>
-      <TrackDuration>{duration}</TrackDuration>
-      <TrackDeleteButton
-        onClick={() => {
-          alert('he');
-        }}
-      />
+      <TrackDuration>{toTrackTime(track.durationMs)}</TrackDuration>
+      {onDelete && (
+        <TrackDeleteButton
+          onClick={() => {
+            onDelete(track);
+          }}
+        />
+      )}
     </RightContainer>
   </TrackListItemContainer>
 );
