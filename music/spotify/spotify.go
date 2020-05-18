@@ -33,7 +33,7 @@ type Service struct{}
 
 // Authenticate provides authenticator for the Spotify and return Client for Spotify.
 func (s Service) Authenticate(authenticator auth.Authenticator) (music.Client, error) {
-	spotifyAuth := auth.GetSpotifyAuthenticator()
+	spotifyAuth := auth.GetSpotifyAuthenticator("")
 	oauthAuthenticator, ok := authenticator.(Authenticator)
 	if !ok {
 		return nil, fmt.Errorf("spotify: cannot process authentication")

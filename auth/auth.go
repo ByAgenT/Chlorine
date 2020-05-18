@@ -19,11 +19,6 @@ import (
 	"golang.org/x/oauth2"
 )
 
-const (
-	// AuthCallback used by Spotify OAuth for complete authorization flow and receive token.
-	AuthCallback = "http://localhost/authcomplete"
-)
-
 var (
 	scopes = []string{"streaming",
 		spotify.ScopeUserLibraryModify,
@@ -41,13 +36,18 @@ var (
 type Authenticator interface{}
 
 // GetSpotifyAuthenticator create new instance of Spotify Authenticator
-func GetSpotifyAuthenticator() spotify.Authenticator {
-	return spotify.NewAuthenticator(AuthCallback, scopes...)
+func GetSpotifyAuthenticator(authCallback string) spotify.Authenticator {
+	return spotify.NewAuthenticator(authCallback, scopes...)
+}
+
+func GetAuthCallback(r *http.Request) string {
+	return fmt.Sprintf("http://%s/authcomplete", r.Host)
 }
 
 // ProcessReceivedToken gets OAuth Token from the callback request.
 func ProcessReceivedToken(r *http.Request, s *sessions.Session) (*oauth2.Token, error) {
-	authenticator := GetSpotifyAuthenticator()
+	authCallback := GetAuthCallback(r)
+	authenticator := GetSpotifyAuthenticator(authCallback)
 	state, ok := s.Values["CSRFState"].(string)
 	if !ok {
 		return nil, errors.New("auth: cannot receive state from session")
@@ -130,8 +130,8 @@ func WriteTokenToSession(session *sessions.Session, token *oauth2.Token) {
 }
 
 // InitializeLogin setup initial login operations and return authentication URL.
-func InitializeLogin(ctx context.Context, session *sessions.Session) string {
-	authenticator := GetSpotifyAuthenticator()
+func InitializeLogin(ctx context.Context, session *sessions.Session, authCallback string) string {
+	authenticator := GetSpotifyAuthenticator(authCallback)
 	state := CreateRandomState(session)
 	session.Values["CSRFState"] = state
 	return authenticator.AuthURL(state)
