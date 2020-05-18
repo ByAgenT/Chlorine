@@ -7,6 +7,7 @@ import { Album, Artist, Song, SpotifyTrack, Token } from '../models/chlorine';
 interface PlaylistTrack {
   id: number;
   spotifyId: string;
+  uri: string;
   name: string;
   artists: Artist[];
   album: Album;
@@ -135,6 +136,7 @@ function useSpotifyPlaylist() {
         return {
           id: song.id,
           spotifyId: spotifySongs[index].id,
+          uri: spotifySongs[index].uri,
           name: spotifySongs[index].name,
           artists: spotifySongs[index].artists,
           album: spotifySongs[index].album,
@@ -174,7 +176,7 @@ function useSpotifyPlaylist() {
 
   async function startPlay(): Promise<void> {
     try {
-      await new ChlorineService().play(spotifyTrackInfo.map((track) => track.uri));
+      await new ChlorineService().play(playlist.map((track) => track.uri));
     } catch (error) {
       console.error(error);
     }
