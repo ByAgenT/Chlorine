@@ -2,6 +2,12 @@ package cl
 
 import (
 	"chlorine/storage"
+	"errors"
+	"fmt"
+)
+
+var (
+	ErrorDeleteProtected = errors.New("delete protected")
 )
 
 type RawMember struct {
@@ -15,6 +21,7 @@ type MemberService interface {
 	UpdateMember(memberID int, member RawMember) error
 	GetMember(memberID int) (*storage.Member, error)
 	GetMemberRole(memberID int) (*storage.MemberRole, error)
+	Delete(memberID int, allowAdminDelete bool) error
 }
 
 type ChlorineMemberService struct {
@@ -28,7 +35,7 @@ func (m ChlorineMemberService) CreateMember(rawMember RawMember) (*storage.Membe
 		Name:   rawMember.Name,
 		RoomID: rawMember.RoomID,
 		Role:   rawMember.Role}
-	err := m.Repository.SaveMember(member)
+	err := m.Repository.Save(member)
 	if err != nil {
 		return nil, err
 	}
@@ -43,17 +50,30 @@ func (m ChlorineMemberService) UpdateMember(memberID int, member RawMember) erro
 		RoomID: member.RoomID,
 		Role:   member.Role,
 	}
-	return m.Repository.SaveMember(memberToUpdate)
+	return m.Repository.Save(memberToUpdate)
 }
 
 func (m ChlorineMemberService) GetMember(memberID int) (*storage.Member, error) {
-	return m.Repository.GetMember(memberID)
+	return m.Repository.Get(memberID)
 }
 
 func (m ChlorineMemberService) GetMemberRole(memberID int) (*storage.MemberRole, error) {
-	member, err := m.Repository.GetMember(memberID)
+	member, err := m.Repository.Get(memberID)
 	if err != nil {
 		return nil, err
 	}
-	return m.Repository.GetMemberRole(member)
+	return m.Repository.GetRole(member)
+}
+
+func (m ChlorineMemberService) Delete(memberID int, allowAdminDelete bool) error {
+	if !allowAdminDelete {
+		role, err := m.GetMemberRole(memberID)
+		if err != nil {
+			return fmt.Errorf("cl: member: %w", err)
+		}
+		if role.IsAdmin {
+			return fmt.Errorf("cl: member: %w", ErrorDeleteProtected)
+		}
+	}
+	return m.Repository.Delete(memberID)
 }

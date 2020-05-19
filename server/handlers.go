@@ -1,6 +1,8 @@
 package server
 
-import "net/http"
+import (
+	"net/http"
+)
 
 var (
 	// Music handler
@@ -21,6 +23,7 @@ var (
 	// Chlorine API handlers
 	roomHandler               RoomHandler
 	memberHandler             MemberHandler
+	memberDetailHandler       MemberDetailHandler
 	roomMembersHandler        RoomMembersHandler
 	roomSongsDetailHandler    RoomSongsDetailHandler
 	roomSongsHandler          RoomSongsHandler
@@ -31,34 +34,70 @@ var (
 )
 
 func initHandlers() {
-	externalMusicHandler = ExternalMusicHandler{MusicService: musicService,
-		AuthenticationProvider: authenticationProvider}
+	externalMusicHandler = ExternalMusicHandler{
+		MusicService:           musicService,
+		AuthenticationProvider: authenticationProvider,
+	}
 
 	// Authentication handlers init
 	loginHandler = LoginHandler{}
-	completeAuthHandler = CompleteAuthHandler{MemberService: memberService, RoomService: roomService}
+	completeAuthHandler = CompleteAuthHandler{
+		MemberService: memberService,
+		RoomService:   roomService,
+	}
 	spotifyTokenHandler = SpotifyTokenHandler{}
 
 	// Music handlers init
-	playlistsHandler = MyPlaylistsHandler{ExternalMusicHandler: externalMusicHandler}
-	availableDevicesHandler = AvailableDevicesHandler{ExternalMusicHandler: externalMusicHandler}
-	playbackHandler = PlaybackHandler{ExternalMusicHandler: externalMusicHandler}
-	searchSongHandler = SearchSongHandler{ExternalMusicHandler: externalMusicHandler}
-	spotifyPlayHandler = SpotifyPlayHandler{ExternalMusicHandler: externalMusicHandler}
+	playlistsHandler = MyPlaylistsHandler{
+		ExternalMusicHandler: externalMusicHandler,
+	}
+	availableDevicesHandler = AvailableDevicesHandler{
+		ExternalMusicHandler: externalMusicHandler,
+	}
+	playbackHandler = PlaybackHandler{
+		ExternalMusicHandler: externalMusicHandler,
+	}
+	searchSongHandler = SearchSongHandler{
+		ExternalMusicHandler: externalMusicHandler,
+	}
+	spotifyPlayHandler = SpotifyPlayHandler{
+		ExternalMusicHandler: externalMusicHandler,
+	}
 
 	// Chlorine API handlers init
-	roomHandler = RoomHandler{MemberService: memberService, RoomService: roomService}
-	memberHandler = MemberHandler{MemberService: memberService, TokenService: tokenService}
-	roomMembersHandler = RoomMembersHandler{MemberService: memberService, RoomService: roomService}
-	roomSongsHandler = RoomSongsHandler{ExternalMusicHandler: externalMusicHandler,
-		SongService: songService, MemberService: memberService, RoomService: roomService}
+	roomHandler = RoomHandler{
+		MemberService: memberService,
+		RoomService:   roomService,
+	}
+	memberHandler = MemberHandler{
+		MemberService: memberService,
+		TokenService:  tokenService,
+	}
+	memberDetailHandler = MemberDetailHandler{
+		MemberService: memberService,
+		TokenService:  tokenService,
+	}
+	roomMembersHandler = RoomMembersHandler{
+		MemberService: memberService,
+		RoomService:   roomService,
+	}
+	roomSongsHandler = RoomSongsHandler{
+		ExternalMusicHandler: externalMusicHandler,
+		SongService:          songService,
+		MemberService:        memberService,
+		RoomService:          roomService,
+	}
 	roomSongsDetailHandler = RoomSongsDetailHandler{
 		ExternalMusicHandler: externalMusicHandler,
 		SongService:          songService,
 		MemberService:        memberService,
 		RoomService:          roomService}
 	roomSongsSpotifiedHandler = RoomsSongsSpotifiedHandler{
-		ExternalMusicHandler: externalMusicHandler, MemberService: memberService, SongService: songService, RoomService: roomService}
+		ExternalMusicHandler: externalMusicHandler,
+		MemberService:        memberService,
+		SongService:          songService,
+		RoomService:          roomService,
+	}
 
 	// WebSocket handlers init
 	wsHandler = WebSocketInitHandler{MemberService: memberService}
