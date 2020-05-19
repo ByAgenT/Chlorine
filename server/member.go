@@ -7,9 +7,12 @@ import (
 	"chlorine/storage"
 	"chlorine/ws"
 	"encoding/json"
+	"errors"
+	"github.com/gorilla/mux"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strconv"
 )
 
 // MemberHandler serve endpoint for creating non-admin member for Chlorine.
@@ -22,7 +25,7 @@ type MemberHandler struct {
 func (h MemberHandler) Get(w http.ResponseWriter, r *http.Request) {
 	session := h.InitSession(r)
 	jsonWriter := JSONResponseWriter{w}
-	member, ok := getMemberIfAuthorized(h.MemberService, session)
+	member, ok := auth.GetMemberIfAuthorized(h.MemberService, session)
 	if !ok {
 		jsonWriter.Error(apierror.APIErrorUnauthorized, http.StatusUnauthorized)
 		return
@@ -73,16 +76,61 @@ func (h MemberHandler) Post(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	auth.WriteTokenToSession(session, oauthToken)
-	session.Values["MemberID"] = int(*member.ID)
+	session.Values["MemberID"] = *member.ID
 	err = session.Save(r, w)
 	if err != nil {
 		log.Printf("server: MemberHandler: error saving session: %s", err)
+		jsonWriter.Error(apierror.APIServerError, http.StatusInternalServerError)
 	}
 	jsonWriter.WriteHeader(http.StatusCreated)
-	ws.Broadcast(roomWSConnections[int(member.RoomID)], &ws.Response{
+	ws.Broadcast(roomWSConnections[member.RoomID], &ws.Response{
 		Type:        ws.TypeBroadcast,
 		Status:      ws.StatusOK,
 		Description: "MemberAdded",
+		Body: map[string]interface{}{
+			"member": member,
+		},
+	})
+}
+
+type MemberDetailHandler struct {
+	auth.Session
+	MemberService cl.MemberService
+	TokenService  cl.TokenService
+}
+
+func (h MemberDetailHandler) Delete(w http.ResponseWriter, r *http.Request) {
+	session := h.InitSession(r)
+	jsonWriter := JSONResponseWriter{w}
+	member, ok := auth.GetMemberIfAuthorized(h.MemberService, session)
+	if !(ok && auth.IsMemberAdministrator(memberService, member)) {
+		jsonWriter.Error(apierror.APIErrorUnauthorized, http.StatusUnauthorized)
+		return
+	}
+	memberID, err := strconv.Atoi(mux.Vars(r)["id"])
+	if err != nil {
+		log.Printf("server: MemberDetailHandler: %s", err)
+		jsonWriter.Error(apierror.APIServerError, http.StatusInternalServerError)
+		return
+	}
+	err = h.MemberService.Delete(memberID, false)
+	if err != nil {
+		if errors.Is(err, cl.ErrorDeleteProtected) {
+			jsonWriter.Error(apierror.APIError{
+				Description: "Administrator cannot be deleted",
+				ErrorCode:   apierror.StatusInvalidRequest,
+			}, http.StatusBadRequest)
+			return
+		}
+		log.Printf("server: MemberDetailHandler: %s", err)
+		jsonWriter.Error(apierror.APIServerError, http.StatusInternalServerError)
+		return
+	}
+	jsonWriter.WriteHeader(http.StatusOK)
+	ws.Broadcast(roomWSConnections[member.RoomID], &ws.Response{
+		Type:        ws.TypeBroadcast,
+		Status:      ws.StatusOK,
+		Description: "MemberDeleted",
 		Body: map[string]interface{}{
 			"member": member,
 		},

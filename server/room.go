@@ -26,7 +26,7 @@ func (h RoomHandler) Get(w http.ResponseWriter, r *http.Request) {
 	session := h.InitSession(r)
 	jsonWriter := JSONResponseWriter{w}
 
-	member, ok := getMemberIfAuthorized(h.MemberService, session)
+	member, ok := auth.GetMemberIfAuthorized(h.MemberService, session)
 	if !ok {
 		jsonWriter.Error(apierror.APIErrorUnauthorized, http.StatusUnauthorized)
 		return
@@ -51,7 +51,7 @@ func (h RoomMembersHandler) Get(w http.ResponseWriter, r *http.Request) {
 	session := h.InitSession(r)
 	jsonWriter := JSONResponseWriter{w}
 
-	member, ok := getMemberIfAuthorized(h.MemberService, session)
+	member, ok := auth.GetMemberIfAuthorized(h.MemberService, session)
 	if !ok {
 		jsonWriter.Error(apierror.APIErrorUnauthorized, http.StatusUnauthorized)
 		return
@@ -83,7 +83,7 @@ type RoomSongsHandler struct {
 func (h RoomSongsHandler) Get(w http.ResponseWriter, r *http.Request) {
 	session := h.InitSession(r)
 	jsonWriter := JSONResponseWriter{w}
-	member, ok := getMemberIfAuthorized(h.MemberService, session)
+	member, ok := auth.GetMemberIfAuthorized(h.MemberService, session)
 	if !ok {
 		jsonWriter.Error(apierror.APIErrorUnauthorized, http.StatusUnauthorized)
 		return
@@ -100,7 +100,7 @@ func (h RoomSongsHandler) Get(w http.ResponseWriter, r *http.Request) {
 func (h RoomSongsHandler) Post(w http.ResponseWriter, r *http.Request) {
 	session := h.InitSession(r)
 	jsonWriter := JSONResponseWriter{w}
-	member, ok := getMemberIfAuthorized(h.MemberService, session)
+	member, ok := auth.GetMemberIfAuthorized(h.MemberService, session)
 	if !ok {
 		jsonWriter.Error(apierror.APIErrorUnauthorized, http.StatusUnauthorized)
 		return
@@ -155,7 +155,7 @@ func (h RoomSongsHandler) Post(w http.ResponseWriter, r *http.Request) {
 func (h RoomSongsHandler) Put(w http.ResponseWriter, r *http.Request) {
 	session := h.InitSession(r)
 	jsonWriter := JSONResponseWriter{w}
-	member, ok := getMemberIfAuthorized(h.MemberService, session)
+	member, ok := auth.GetMemberIfAuthorized(h.MemberService, session)
 	if !ok {
 		jsonWriter.Error(apierror.APIErrorUnauthorized, http.StatusUnauthorized)
 		return
@@ -212,7 +212,7 @@ type RoomsSongsSpotifiedHandler struct {
 func (h RoomsSongsSpotifiedHandler) Get(w http.ResponseWriter, r *http.Request) {
 	session := h.InitSession(r)
 	jsonWriter := JSONResponseWriter{w}
-	member, ok := getMemberIfAuthorized(h.MemberService, session)
+	member, ok := auth.GetMemberIfAuthorized(h.MemberService, session)
 	if !ok {
 		jsonWriter.Error(apierror.APIErrorUnauthorized, http.StatusUnauthorized)
 		return
@@ -252,8 +252,8 @@ type RoomSongsDetailHandler struct {
 func (h RoomSongsDetailHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	session := h.InitSession(r)
 	jsonWriter := JSONResponseWriter{w}
-	member, ok := getMemberIfAuthorized(h.MemberService, session)
-	if !ok {
+	member, ok := auth.GetMemberIfAuthorized(h.MemberService, session)
+	if !ok && auth.IsMemberAdministrator(memberService, member) {
 		jsonWriter.Error(apierror.APIErrorUnauthorized, http.StatusUnauthorized)
 		return
 	}

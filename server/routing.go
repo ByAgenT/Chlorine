@@ -45,6 +45,7 @@ func chlorineRouting(router *mux.Router) {
 	router.Handle("/room/songs/{id:[0-9]+}", createDispatchableHandler(roomSongsDetailHandler)).Methods(http.MethodDelete)
 	router.Handle("/room/songs/spotify", createDispatchableHandler(roomSongsSpotifiedHandler)).Methods(http.MethodGet)
 	router.Handle("/member", createDispatchableHandler(memberHandler)).Methods(http.MethodGet, http.MethodPost)
+	router.Handle("/members/{id:[0-9]+}", createDispatchableHandler(memberDetailHandler)).Methods(http.MethodDelete)
 }
 
 func wsRouting(router *mux.Router) {
