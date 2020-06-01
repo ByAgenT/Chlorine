@@ -16,8 +16,8 @@ interface SettingsProps {
 
 const Settings: React.FC<SettingsProps> = ({ roomId }) => {
   const { t } = useTranslation();
-  const [songsPerMember, setSongsPerMember] = useState<number>(0);
-  const [maxMembers, setMaxMembers] = useState<number>(0);
+  const [songsPerMember, setSongsPerMember] = useState<number>(5);
+  const [maxMembers, setMaxMembers] = useState<number>(10);
   const [showLinkModal, setLinkModal] = useState<boolean>(false);
 
   return (
