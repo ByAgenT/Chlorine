@@ -71,6 +71,9 @@ const PlayerPage: React.FC<PlayerPageProps> = ({ member }) => {
     webSocketConnection.onBroadcast('MemberAdded', () => {
       updateMembers();
     });
+    webSocketConnection.onBroadcast('MemberDeleted', () => {
+      updateMembers();
+    });
     webSocketConnection.onBroadcast('SongDeleted', () => {
       updatePlaylist();
     });
@@ -78,6 +81,8 @@ const PlayerPage: React.FC<PlayerPageProps> = ({ member }) => {
     return () => {
       webSocketConnection.removeOnBroadcastListener('SongAdded');
       webSocketConnection.removeOnBroadcastListener('MemberAdded');
+      webSocketConnection.removeOnBroadcastListener('MemberDeleted');
+      webSocketConnection.removeOnBroadcastListener('SongDeleted');
     };
   }, [updatePlaylist, webSocketConnection, updateMembers]);
 
