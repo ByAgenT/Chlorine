@@ -15,7 +15,7 @@
   "dependencies": {
     "date-fns": "^2.13.0",
     "i18next": "^19.4.4",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.19",
     "mobx": "^5.15.1",
     "mobx-react": "^6.1.4",
     "react": "^16.12.0",
