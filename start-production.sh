@@ -1,1 +1,1 @@
-docker-compose up --build db api webserver
+docker compose up --build db api webserver

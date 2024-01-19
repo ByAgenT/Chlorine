@@ -19,7 +19,7 @@ var (
 		Port:     os.Getenv("POSTGRES_PORT"),
 		User:     os.Getenv("POSTGRES_USER"),
 		Password: os.Getenv("POSTGRES_PASSWORD"),
-		Name:     os.Getenv("POSTGRES_DATABASE")}
+		Name:     os.Getenv("POSTGRES_DB")}
 	webSocketHub = ws.CreateHub()
 )
 
