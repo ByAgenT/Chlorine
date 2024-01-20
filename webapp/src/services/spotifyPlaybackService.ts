@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/camelcase */
 class SpotifyPlayer {
-  private readonly player: Spotify.SpotifyPlayer;
+  private readonly player: Spotify.Player;
 
   constructor(player) {
     this.player = player;

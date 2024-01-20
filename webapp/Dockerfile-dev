@@ -1,12 +1,15 @@
 # Build web application
-FROM node:13.11 as build-stage
+FROM node:21-slim AS build-stage
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
 
 WORKDIR /webapp
 
 COPY package*.json /webapp/
-RUN npm install
+RUN pnpm install
 COPY . /webapp/
-RUN npm run build
+RUN pnpm build
 
 # Use nginx to serve web application
 FROM nginx:1.17
