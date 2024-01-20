@@ -7,7 +7,7 @@ import { App } from './App';
 import { initReactI18next } from 'react-i18next';
 
 i18n.default.use(initReactI18next).init({
-  whitelist: ['en', 'ru'],
+  supportedLngs: ['en', 'ru'],
   resources: {
     en: {
       translation: localeEN,
@@ -18,7 +18,6 @@ i18n.default.use(initReactI18next).init({
   },
   lng: 'en',
   fallbackLng: ['en', 'ru'],
-
   interpolation: {
     escapeValue: false,
   },
