@@ -6,12 +6,9 @@ on:
       - master
 
 jobs:
-
   build:
-
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v1
-    - name: Build the Docker image for Chlorine server
-      run: docker build . --tag chlorine:$(date +%s)
+      - uses: actions/checkout@v1
+      - name: Build the Docker image for Chlorine server
+        run: docker build . --tag chlorine:$(date +%s)

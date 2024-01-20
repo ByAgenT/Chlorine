@@ -30,10 +30,12 @@ module.exports = {
       template: 'src/static/index.html',
       filename: 'index.html',
     }),
-    new CopyWebpackPlugin([
-      { from: 'src/static/icons', to: 'icons' },
-      { from: 'src/static/fonts', to: 'fonts' },
-    ]),
+    new CopyWebpackPlugin({
+      patterns: [
+        { from: 'src/static/icons', to: 'icons' },
+        { from: 'src/static/fonts', to: 'fonts' },
+      ],
+    }),
   ],
   devServer: {
     contentBase: path.join(__dirname, 'dist'),
@@ -47,7 +49,7 @@ module.exports = {
       },
       '/ws': {
         target: 'ws://localhost:8080',
-        ws: true
+        ws: true,
       },
     },
   },
